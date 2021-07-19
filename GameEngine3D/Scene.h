@@ -7,6 +7,13 @@ public:
 	Scene();
 	~Scene();
 
+	void start();
+	void update(float deltaTime);
+
+
+	void addObject(Object* object);
+	void destroyObject(Object* object);
+
 private:
 	std::vector<Object*> objects;
 };
