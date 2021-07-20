@@ -8,10 +8,11 @@
 class Mesh : public Object {
 public:
 	Mesh(
+		Scene* scene,
 		std::string name = "Mesh",
-		Vector3 position = Vector3(0.f, 0.f, 0.f),
-		Vector3 rotation = Vector3(0.f, 0.f, 0.f),
-		Vector3 scale = Vector3(1.f, 1.f, 1.f),
+		glm::vec3 position = glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f),
+		glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f),
 		Object* parent = nullptr,
 		std::string sourceFile = "",
 		Material* material = nullptr

@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "Camera.h"
 #include <vector>
 
 class Scene {
@@ -12,7 +13,9 @@ public:
 	void postUpdate(float deltaTime);
 
 	void addObject(Object* object);
-	void destroyObject(Object* object);
+	void removeObject(Object* object);
+
+	Camera* activeCamera;
 
 private:
 	std::vector<Object*> objects;

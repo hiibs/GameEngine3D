@@ -13,7 +13,7 @@ void Engine::loadScene(Scene* scene) {
 	if (this->scene)
 		delete this->scene;
 
-	this->scene = scene
+	this->scene = scene;
 }
 
 void Engine::initialize() {

@@ -1,6 +1,8 @@
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(std::string name, Vector3 position, Vector3 rotation, Vector3 scale, Object* parent, float intensity, Vector3 color) :
-	Light(name, position, rotation, scale, parent, intensity, color)
+DirectionalLight::DirectionalLight(Scene* scene, std::string name, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Object* parent, float intensity, glm::vec3 color) :
+	Object(scene, name, position, rotation, scale, parent),
+	intensity(intensity),
+	color(color)
 {
 }

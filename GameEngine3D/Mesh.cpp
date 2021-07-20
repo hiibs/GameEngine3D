@@ -5,8 +5,8 @@
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/LogStream.hpp>
 
-Mesh::Mesh(std::string name, Vector3 position, Vector3 rotation, Vector3 scale, Object* parent, std::string sourceFile, Material* material) :
-	Object(name, position, rotation, scale, parent),
+Mesh::Mesh(Scene* scene, std::string name, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Object* parent, std::string sourceFile, Material* material) :
+	Object(scene, name, position, rotation, scale, parent),
 	sourceFile(sourceFile),
 	material(material)
 {
@@ -90,6 +90,6 @@ void Mesh::processNode(aiNode* node, const aiScene* scene) {
 	}
 }
 
-void Mesh::draw()
-{
+void Mesh::draw() {
+
 }

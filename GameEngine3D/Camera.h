@@ -2,20 +2,20 @@
 #include "Object.h"
 #include <glm.hpp>
 
-class DirectionalLight : public Object {
+class Camera : public Object {
 public:
-	DirectionalLight(
+	Camera(
 		Scene* scene,
-		std::string name = "Directional Light",
+		std::string name = "Object",
 		glm::vec3 position = glm::vec3(0.f, 0.f, 0.f),
 		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f),
 		glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f),
 		Object* parent = nullptr,
-		float intensity = 1.f,
-		glm::vec3 color = glm::vec3(1.f, 1.f, 1.f)
+		float fov = 90.f,
+		float nearClip = 0.1f,
+		float farClip = 100.f
 	);
 
-	float intensity;
-	glm::vec3 color;
+	glm::mat4 projection;
 };
 
