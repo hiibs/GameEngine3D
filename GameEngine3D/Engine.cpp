@@ -62,6 +62,8 @@ void Engine::initialize() {
 }
 
 void Engine::update(float deltaTime) {
-	if (scene)
+	if (scene) {
 		scene->update(deltaTime);
+		scene->postUpdate(deltaTime);
+	}
 }

@@ -1,6 +1,6 @@
 #include "Object.h"
 
-Object::Object(std::string name, Vector3 position, Quaternion rotation, Vector3 scale, Object* parent) :
+Object::Object(std::string name, Vector3 position, Vector3 rotation, Vector3 scale, Object* parent) :
 	position(position),
 	rotation(rotation),
 	scale(scale),
