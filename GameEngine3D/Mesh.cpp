@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "Scene.h"
 #include <glad/glad.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -38,9 +39,7 @@ void Mesh::load() {
 	glBindVertexArray(vao);
 	// load data into vertex buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
@@ -67,16 +66,16 @@ void Mesh::processNode(aiNode* node, const aiScene* scene) {
 			Vertex vertex;
 			vertex.position = glm::vec3(mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z);
 
-			vertex.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+			vertex.normal = glm::vec3(mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z);
 
 			if (mesh->HasTextureCoords(0))
-				vertex.texCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+				vertex.texCoords = glm::vec2(mesh->mTextureCoords[0][j].x, mesh->mTextureCoords[0][j].y);
 
 			vertices.push_back(vertex);
 		}
 
 		for (int j = 0; j < mesh->mNumFaces; j++) {
-			aiFace face = mesh->mFaces[i];
+			aiFace face = mesh->mFaces[j];
 
 			for (unsigned int j = 0; j < face.mNumIndices; j++) {
 				indices.push_back(face.mIndices[j]);
@@ -91,5 +90,36 @@ void Mesh::processNode(aiNode* node, const aiScene* scene) {
 }
 
 void Mesh::draw() {
+	if (!scene->activeCamera) {
+		printf("Scene has no active camera!\n");
+		return;
+	}
 
+	glUseProgram(material->shaderProgram);
+
+	glm::mat4 mvp = scene->activeCamera->projection * glm::inverse(scene->activeCamera->getModelMatrix()) * getModelMatrix();
+	glm::mat4 m = getModelMatrix();
+
+	material->setUniform("MVP", mvp);
+	material->setUniform("M", m);
+	material->setUniform("viewPos", scene->activeCamera->position);
+	material->setUniform("ambientColor", scene->ambientColor);
+	material->setUniform("ambientIntensity", scene->ambientIntensity);
+
+	material->setPointLightsUniform(scene->getPointLights());
+
+	// Set the texture uniform, if texture exists
+	if (material->colorMap->id > 0) {
+		material->setUniform("colorMap", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, material->colorMap->id);
+	}
+
+	// draw mesh
+	glBindVertexArray(vao);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+
+	// always good practice to set everything back to defaults once configured.
+	glActiveTexture(GL_TEXTURE0);
 }

@@ -1,22 +1,10 @@
 #include "Engine.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 
 Engine::Engine(int width, int height) :
-	scene(nullptr)
+	scene(nullptr),
+	window(nullptr)
 {
-	initialize();
-}
-
-void Engine::loadScene(Scene* scene) {
-	if (this->scene)
-		delete this->scene;
-
-	this->scene = scene;
-}
-
-void Engine::initialize() {
 	// Set c++-lambda as error call back function for glfw.
 	glfwSetErrorCallback([](int error, const char* description) {
 		fprintf(stderr, "Error %d: %s\n", error, description);
@@ -29,7 +17,7 @@ void Engine::initialize() {
 	}
 
 	// Create window and check that creation was succesful.
-	GLFWwindow* window = glfwCreateWindow(640, 480, "OpenGL window", NULL, NULL);
+	window = glfwCreateWindow(width, height, "OpenGL window", NULL, NULL);
 	if (!window) {
 		std::cout << "Failed  to create glfw window!";
 		glfwTerminate();
@@ -48,6 +36,25 @@ void Engine::initialize() {
 		}
 	});
 
+
+	// Enable depth buffering
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	// Backface culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+}
+
+void Engine::loadScene(Scene* scene) {
+	if (this->scene)
+		delete this->scene;
+
+	this->scene = scene;
+}
+
+void Engine::start() {
 	// Get time using glfwGetTime-function, for delta time calculation.
 	float prevTime = (float)glfwGetTime();
 
@@ -62,8 +69,31 @@ void Engine::initialize() {
 }
 
 void Engine::update(float deltaTime) {
-	if (scene) {
-		scene->update(deltaTime);
-		scene->postUpdate(deltaTime);
+	if (!scene) {
+		printf("No active scene!\n");
+		return;
 	}
+
+	// Poll other window events.
+	glfwPollEvents();
+
+	// Update event (Game logic)
+	scene->update(deltaTime);
+
+	
+	// Query the size of the framebuffer (window content) from glfw.
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	// Setup the opengl wiewport (i.e specify area to draw)
+	glViewport(0, 0, width, height);
+	// Set color to be used when clearing the screen
+	glClearColor(0.f, 0.f, 0.f, 1.0f);
+	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+	// Post-Update event (drawing objects in scene) 
+	scene->postUpdate(deltaTime);
+
+	glfwSwapBuffers(window);
 }

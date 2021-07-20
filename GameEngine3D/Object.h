@@ -1,8 +1,9 @@
 #pragma once
-#include "Scene.h"
-#include <glm.hpp>
+#include <gtx/transform.hpp>
 #include <vector>
 #include <string>
+
+class Scene;
 
 class Object {
 public:
@@ -29,7 +30,9 @@ public:
 	void setParent(Object* parent);
 	void clearParent();
 
-private:
+	glm::mat4 getModelMatrix() const;
+
+protected:
 	Object* parent;
 	Scene* scene;
 };

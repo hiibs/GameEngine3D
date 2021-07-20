@@ -12,10 +12,14 @@ public:
 		glm::vec3 scale = glm::vec3(1.f, 1.f, 1.f),
 		Object* parent = nullptr,
 		float intensity = 1.f,
-		glm::vec3 color = glm::vec3(1.f, 1.f, 1.f)
+		glm::vec3 color = glm::vec3(1.f, 1.f, 1.f),
+		float radius = 10.f
 	);
+
+	~PointLight();
 
 	float intensity;
 	glm::vec3 color;
+	float radius;
 };
 

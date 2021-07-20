@@ -1,7 +1,9 @@
 #pragma once
 #include "Texture.h"
+#include "PointLight.h"
 #include <glm.hpp>
 #include <string>
+#include <vector>
 
 class Material {
 public:
@@ -13,6 +15,8 @@ public:
 	Texture* metalnessMap;
 
 	std::string shaderFile;
+	int shaderProgram;
+
 
 	void compileShader();
 
@@ -21,10 +25,9 @@ public:
 	void setUniform(const std::string& name, glm::mat4& m);
 	void setUniform(const std::string& name, float value);
 	void setUniform(const std::string& name, int value);
+	void setPointLightsUniform(const std::vector<PointLight*>& lights);
 
 private:
-	int shaderProgram;
-
-	const char* parseTextFromFile(std::string path);
+	std::string parseTextFromFile(std::string path);
 };
 
