@@ -32,15 +32,13 @@ public:
 	const std::vector<Vertex> getVertices() const;
 	const std::vector<unsigned int> getIndices() const;
 
-	const glm::vec3 getBoundariesMin();
-	const glm::vec3 getBoundariesMax();
+	const glm::vec3* getBounds();
 
 private:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	unsigned int ebo, vao, vbo;
 
-	glm::vec3 boundariesMin;
-	glm::vec3 boundariesMax;
+	glm::vec3 localBounds[2];
 };
 

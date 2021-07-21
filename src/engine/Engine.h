@@ -8,6 +8,7 @@
 class Engine {
 public:
 	Engine(int width = 1280, int height = 720);
+	~Engine();
 
 	void start();
 	void loadScene(Scene* scene);

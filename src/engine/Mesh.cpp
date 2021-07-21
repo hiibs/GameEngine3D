@@ -40,7 +40,7 @@ void Mesh::loadMesh(std::string fileName) {
 	}
 
 	processNode(scene->mRootNode, scene);
-
+	
 
 	// Find model boundaries
 	float minX = vertices[0].position.x;
@@ -50,23 +50,23 @@ void Mesh::loadMesh(std::string fileName) {
 	float maxY = vertices[0].position.y;
 	float maxZ = vertices[0].position.z;
 
-	for (const Vertex &v : vertices) {
+	for (const Vertex& v : vertices) {
 		if (v.position.x < minX)
 			minX = v.position.x;
 		if (v.position.y < minY)
-			minX = v.position.y;
+			minY = v.position.y;
 		if (v.position.z < minZ)
-			minX = v.position.z;
-
+			minZ = v.position.z;
 		if (v.position.x > maxX)
-			minX = v.position.x;
+			maxX = v.position.x;
 		if (v.position.y > maxY)
-			minX = v.position.y;
+			maxY = v.position.y;
 		if (v.position.z > maxZ)
-			minX = v.position.z;
+			maxZ = v.position.z;
 	}
 
-
+	localBounds[0] = glm::vec3(minX, minY, minZ);
+	localBounds[1] = glm::vec3(maxX, maxY, maxZ);
 
 	// create buffers/arrays
 	glGenVertexArrays(1, &vao);
@@ -218,10 +218,52 @@ const std::vector<unsigned int> Mesh::getIndices() const {
 	return indices;
 }
 
-const glm::vec3 Mesh::getBoundariesMin() {
-	return boundariesMin;
-}
+const glm::vec3* Mesh::getBounds() {
+	glm::vec3 boxMesh[] = {
+		glm::vec3(localBounds[0].x, localBounds[0].y, localBounds[0].z),
+		glm::vec3(localBounds[0].x, localBounds[0].y, localBounds[1].z),
+		glm::vec3(localBounds[0].x, localBounds[1].y, localBounds[0].z),
+		glm::vec3(localBounds[0].x, localBounds[1].y, localBounds[1].z),
+		glm::vec3(localBounds[1].x, localBounds[0].y, localBounds[0].z),
+		glm::vec3(localBounds[1].x, localBounds[0].y, localBounds[1].z),
+		glm::vec3(localBounds[1].x, localBounds[1].y, localBounds[0].z),
+		glm::vec3(localBounds[1].x, localBounds[1].y, localBounds[1].z),
+	};
 
-const glm::vec3 Mesh::getBoundariesMax() {
-	return boundariesMin;
+	// Transform to world space
+	for (int i = 0; i < 8; i++) {
+		boxMesh[i] = getModelMatrix() * glm::vec4(boxMesh[i], 1.f);
+	}
+
+	
+	float minX = boxMesh[0].x;
+	float minY = boxMesh[0].y;
+	float minZ = boxMesh[0].z;
+	float maxX = boxMesh[0].x;
+	float maxY = boxMesh[0].y;
+	float maxZ = boxMesh[0].z;
+
+
+	// Find boundaries
+	for (int i = 0; i < 8; i++) {
+		if (boxMesh[i].x < minX)
+			minX = boxMesh[i].x;
+		if (boxMesh[i].y < minY)
+			minY = boxMesh[i].y;
+		if (boxMesh[i].z < minZ)
+			minZ = boxMesh[i].z;
+		if (boxMesh[i].x > maxX)
+			maxX = boxMesh[i].x;
+		if (boxMesh[i].y > maxY)
+			maxY = boxMesh[i].y;
+		if (boxMesh[i].z > maxZ)
+			maxZ = boxMesh[i].z;
+	}
+
+	glm::vec3 bounds[] = {
+		glm::vec3(minX, minY, minZ),
+		glm::vec3(maxX, maxY, maxZ)
+	};
+
+	return bounds;
 }

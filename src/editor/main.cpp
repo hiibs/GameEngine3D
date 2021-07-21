@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Mesh.h"
 #include "CameraController.h"
+#include "Spin.h"
 #include <glm/glm.hpp>
 
 int main() {
@@ -9,7 +10,7 @@ int main() {
 
 	Texture* floorTex = new Texture("Checkerboard.png");
 	Material* floorMat = new Material(floorTex);
-
+	
 	Mesh* floor = new Mesh(world);
 	floor->loadMesh("Box.obj");
 	floor->position = glm::vec3(0.f, 0.f, -0.5f);
@@ -21,13 +22,15 @@ int main() {
 	wall->position = glm::vec3(0.f, 10.f, 1.5f);
 	wall->scale = glm::vec3(10.f, 1.f, 3.f);
 	wall->material = floorMat;
+	wall->rotation.z = 30.f;
 
 	BoxHull* cameraParent = new BoxHull(world);
+	cameraParent->position = glm::vec3(0.f, 0.f, 1.f);
 	CameraController* controller = new CameraController(cameraParent);
 
 	Camera* camera = new Camera(world);
 	camera->setParent(cameraParent);
-	camera->position = glm::vec3(0.f, 0.f, 1.6f);
+	camera->position = glm::vec3(0.f, 0.f, 0.f);
 	camera->rotation = glm::vec3(90.f, 00.f, 0.f);
 	
 	PointLight* light = new PointLight(world);
@@ -41,6 +44,14 @@ int main() {
 	light->color = glm::vec3(1.f, 0.8f, 0.5f);
 	light->intensity = 1.f;
 	light->radius = 20.f;
+
+	Mesh* monke = new Mesh(world);
+	monke->position = glm::vec3(0.f, 5.f, 1.f);
+	monke->loadMesh("Suzanne.obj");
+	monke->material = floorMat;
+
+	Spin* spin = new Spin(monke);
+
 	/*
 	DirLight* sun = new DirLight(world);
 	sun->rotation = glm::vec3(-60.f, 0.f, -30.f);

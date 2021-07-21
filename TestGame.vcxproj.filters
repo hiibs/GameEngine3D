@@ -66,6 +66,9 @@
     <ClCompile Include="src\engine\Physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\editor\Spin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\editor\CameraController.h">
@@ -1200,6 +1203,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Physics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\editor\Spin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

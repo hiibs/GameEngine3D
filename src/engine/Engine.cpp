@@ -61,6 +61,11 @@ Engine::Engine(int width, int height) :
 	physics = new Physics();
 }
 
+Engine::~Engine() {
+	delete input;
+	delete physics;
+}
+
 void Engine::loadScene(Scene* scene) {
 	if (this->scene)
 		delete this->scene;
@@ -71,9 +76,6 @@ void Engine::loadScene(Scene* scene) {
 		scene->activeCamera->setAspect(w, h);
 
 	this->scene = scene;
-
-	delete input;
-	delete physics;
 }
 
 void Engine::onWindowSizeChanged(int width, int height) {

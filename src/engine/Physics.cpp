@@ -3,24 +3,27 @@
 void Physics::update() {
 	
 	for (BoxHull* box : boxHulls) {
+		
 		for (Mesh* mesh : meshes) {
 
-
-			glm::vec3 boxMin = box->getModelMatrix() * glm::vec4(-box->halfExtents, 1.f);
-			glm::vec3 boxMax = box->getModelMatrix() * glm::vec4(box->halfExtents, 1.f);
-			glm::vec3 meshMin = mesh->getModelMatrix() * glm::vec4(mesh->getBoundariesMin(), 1.f);
-			glm::vec3 meshMax = mesh->getModelMatrix() * glm::vec4(mesh->getBoundariesMax(), 1.f);
+			const glm::vec3* bounds = mesh->getBounds();
+			
+			glm::vec3 boxMin = -box->halfExtents * box->scale + box->position;
+			glm::vec3 boxMax = box->halfExtents * box->scale + box->position;
+			glm::vec3 meshMin = bounds[0];
+			glm::vec3 meshMax = bounds[1];
 
 
 			if (boxMin.x < meshMax.x && boxMax.x > meshMin.x &&
 				boxMin.y < meshMax.y && boxMax.y > meshMin.y &&
 				boxMin.z < meshMax.z && boxMax.z > meshMin.z) {
+				//printf("Collision detected!");
 				
 				float xCorrection = (meshMax.x - boxMin.x) < -(meshMin.x - boxMax.x) ? (meshMax.x - boxMin.x) : (meshMin.x - boxMax.x);
 				float yCorrection = (meshMax.y - boxMin.y) < -(meshMin.y - boxMax.y) ? (meshMax.y - boxMin.y) : (meshMin.y - boxMax.y);
 				float zCorrection = (meshMax.z - boxMin.z) < -(meshMin.z - boxMax.z) ? (meshMax.z - boxMin.z) : (meshMin.z - boxMax.z);
 
-				printf("Collision detected!\n");
+				//printf("%f\n", zCorrection);
 
 				if (abs(xCorrection) < abs(yCorrection) && abs(xCorrection) < abs(zCorrection)) {
 					box->position.x += xCorrection;
@@ -55,7 +58,7 @@ void Physics::addMesh(Mesh* object) {
 		if (object == m)
 			return;
 	}
-
+	
 	meshes.push_back(object);
 }
 
@@ -70,10 +73,11 @@ void Physics::removeMesh(Mesh* object) {
 
 void Physics::addBoxHull(BoxHull* object) {
 	for (BoxHull* b : boxHulls) {
-		if (object == b)
+		if (object == b) {
 			return;
+		}
 	}
-
+	
 	boxHulls.push_back(object);
 }
 

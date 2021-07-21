@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\editor\Spin.cpp" />
     <ClCompile Include="src\engine\Physics.cpp" />
     <ClCompile Include="src\engine\BoxHull.cpp" />
     <ClCompile Include="ext\include\glad\glad.c" />
@@ -164,6 +165,7 @@
     <ClCompile Include="src\engine\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\editor\Spin.h" />
     <ClInclude Include="src\engine\Physics.h" />
     <ClInclude Include="src\engine\BoxHull.h" />
     <ClInclude Include="ext\include\assimp\aabb.h" />
