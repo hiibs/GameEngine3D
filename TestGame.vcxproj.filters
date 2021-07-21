@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\demo\main.cpp">
+    <ClCompile Include="src\editor\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\demo\PlayerController.cpp">
+    <ClCompile Include="src\editor\CameraController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\Behaviour.cpp">
@@ -60,9 +60,15 @@
     <ClCompile Include="ext\include\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\BoxHull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Physics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\demo\PlayerController.h">
+    <ClInclude Include="src\editor\CameraController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Behaviour.h">
@@ -1188,6 +1194,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ext\include\stb\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\BoxHull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

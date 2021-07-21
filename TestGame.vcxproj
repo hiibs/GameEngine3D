@@ -145,10 +145,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\Physics.cpp" />
+    <ClCompile Include="src\engine\BoxHull.cpp" />
     <ClCompile Include="ext\include\glad\glad.c" />
     <ClCompile Include="ext\include\glm\detail\glm.cpp" />
-    <ClCompile Include="src\demo\main.cpp" />
-    <ClCompile Include="src\demo\PlayerController.cpp" />
+    <ClCompile Include="src\editor\main.cpp" />
+    <ClCompile Include="src\editor\CameraController.cpp" />
     <ClCompile Include="src\engine\Behaviour.cpp" />
     <ClCompile Include="src\engine\Camera.cpp" />
     <ClCompile Include="src\engine\DirLight.cpp" />
@@ -162,6 +164,8 @@
     <ClCompile Include="src\engine\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\engine\Physics.h" />
+    <ClInclude Include="src\engine\BoxHull.h" />
     <ClInclude Include="ext\include\assimp\aabb.h" />
     <ClInclude Include="ext\include\assimp\ai_assert.h" />
     <ClInclude Include="ext\include\assimp\anim.h" />
@@ -526,7 +530,7 @@
     <ClInclude Include="ext\include\glm\vector_relational.hpp" />
     <ClInclude Include="ext\include\KHR\khrplatform.h" />
     <ClInclude Include="ext\include\stb\stb_image.h" />
-    <ClInclude Include="src\demo\PlayerController.h" />
+    <ClInclude Include="src\editor\CameraController.h" />
     <ClInclude Include="src\engine\Behaviour.h" />
     <ClInclude Include="src\engine\Camera.h" />
     <ClInclude Include="src\engine\DirLight.h" />

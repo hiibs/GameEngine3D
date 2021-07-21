@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "Input.h"
 
 class Behaviour
 {
@@ -12,5 +13,7 @@ public:
 
 protected:
 	Object* owner;
+
+	const Input* getInput() const;
 };
 

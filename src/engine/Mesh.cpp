@@ -1,5 +1,7 @@
 #include "Mesh.h"
 #include "Scene.h"
+#include "Engine.h"
+#include "Physics.h"
 #include <glad/glad.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -11,6 +13,14 @@ Mesh::Mesh(Scene* scene) :
 	material(nullptr)
 {
 	name = "Mesh";
+
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(glfwGetCurrentContext()));
+	engine->getPhysics()->addMesh(this);
+}
+
+Mesh::~Mesh() {
+	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(glfwGetCurrentContext()));
+	engine->getPhysics()->removeMesh(this);
 }
 
 void Mesh::loadMesh(std::string fileName) {
@@ -30,6 +40,33 @@ void Mesh::loadMesh(std::string fileName) {
 	}
 
 	processNode(scene->mRootNode, scene);
+
+
+	// Find model boundaries
+	float minX = vertices[0].position.x;
+	float minY = vertices[0].position.y;
+	float minZ = vertices[0].position.z;
+	float maxX = vertices[0].position.x;
+	float maxY = vertices[0].position.y;
+	float maxZ = vertices[0].position.z;
+
+	for (const Vertex &v : vertices) {
+		if (v.position.x < minX)
+			minX = v.position.x;
+		if (v.position.y < minY)
+			minX = v.position.y;
+		if (v.position.z < minZ)
+			minX = v.position.z;
+
+		if (v.position.x > maxX)
+			minX = v.position.x;
+		if (v.position.y > maxY)
+			minX = v.position.y;
+		if (v.position.z > maxZ)
+			minX = v.position.z;
+	}
+
+
 
 	// create buffers/arrays
 	glGenVertexArrays(1, &vao);
@@ -171,4 +208,20 @@ void Mesh::configureShaderAndMatrices()
 
 void Mesh::renderScene()
 {
+}
+
+const std::vector<Mesh::Vertex> Mesh::getVertices() const {
+	return std::vector<Vertex>();
+}
+
+const std::vector<unsigned int> Mesh::getIndices() const {
+	return indices;
+}
+
+const glm::vec3 Mesh::getBoundariesMin() {
+	return boundariesMin;
+}
+
+const glm::vec3 Mesh::getBoundariesMax() {
+	return boundariesMin;
 }

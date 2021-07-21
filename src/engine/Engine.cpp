@@ -52,6 +52,13 @@ Engine::Engine(int width, int height) :
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+
+	// Enable raw mouse input
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+	input = new Input(window);
+	physics = new Physics();
 }
 
 void Engine::loadScene(Scene* scene) {
@@ -64,12 +71,23 @@ void Engine::loadScene(Scene* scene) {
 		scene->activeCamera->setAspect(w, h);
 
 	this->scene = scene;
+
+	delete input;
+	delete physics;
 }
 
 void Engine::onWindowSizeChanged(int width, int height) {
 	glViewport(0, 0, width, height);
 	if (scene->activeCamera)
 		scene->activeCamera->setAspect(width, height);
+}
+
+const Input* Engine::getInput() const {
+	return input;
+}
+
+Physics* Engine::getPhysics() const {
+	return physics;
 }
 
 void Engine::start() {
@@ -95,16 +113,20 @@ void Engine::update(float deltaTime) {
 	// Poll other window events.
 	glfwPollEvents();
 
-	// Update event (Game logic)
+	// Update input
+	input->update();
+
+	// Update game logic
 	scene->update(deltaTime);
 
-	// Set color to be used when clearing the screen
+	// Update physics
+	physics->update();
+
+	// Clear Screen
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
-	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-	// Post-Update event (drawing objects in scene) 
+	// Draw
 	scene->postUpdate(deltaTime);
 
 	glfwSwapBuffers(window);

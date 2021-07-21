@@ -3,6 +3,7 @@
 #include "DirLight.h"
 #include "Camera.h"
 #include <vector>
+#include <Mesh.h>
 
 class Scene {
 public:
@@ -24,12 +25,9 @@ public:
 	void removePointLight(PointLight* object);
 	const std::vector<PointLight*> getPointLights() const;
 
-
 	void addDirLight(DirLight* object);
 	void removeDirLight(DirLight* object);
 	const std::vector<DirLight*> getDirLights() const;
-
-	
 
 private:
 	std::vector<Object*> objects;

@@ -1,5 +1,7 @@
 #pragma once
 #include "Scene.h"
+#include "Input.h"
+#include "Physics.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -12,10 +14,15 @@ public:
 
 	void onWindowSizeChanged(int width, int height);
 
+	const Input* getInput() const;
+	Physics* getPhysics() const;
+
 private:
 	Scene* scene;
 	GLFWwindow* window;
-	
+	Input* input;
+	Physics* physics;
+
 	void update(float deltaTime);
 };
 

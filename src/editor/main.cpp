@@ -1,6 +1,6 @@
 #include "Engine.h"
 #include "Mesh.h"
-#include "PlayerController.h"
+#include "CameraController.h"
 #include <glm/glm.hpp>
 
 int main() {
@@ -18,36 +18,34 @@ int main() {
 
 	Mesh* wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
-	wall->position = glm::vec3(10.f, 0.f, 1.5f);
-	wall->scale = glm::vec3(1.f, 10.f, 3.f);
+	wall->position = glm::vec3(0.f, 10.f, 1.5f);
+	wall->scale = glm::vec3(10.f, 1.f, 3.f);
 	wall->material = floorMat;
 
-	Object* player = new Object(world);
-
-	PlayerController* controller = new PlayerController(player);
+	BoxHull* cameraParent = new BoxHull(world);
+	CameraController* controller = new CameraController(cameraParent);
 
 	Camera* camera = new Camera(world);
-	camera->setParent(player);
+	camera->setParent(cameraParent);
 	camera->position = glm::vec3(0.f, 0.f, 1.6f);
-	camera->rotation = glm::vec3(90.f, 0.f, -90.f);
-	/*
+	camera->rotation = glm::vec3(90.f, 00.f, 0.f);
+	
 	PointLight* light = new PointLight(world);
 	light->position = glm::vec3(0.f, 0.f, 2.f);
 	light->color = glm::vec3(1.f, 0.8f, 0.5f);
 	light->intensity = 1.f;
-	light->radius = 20.f;*/
+	light->radius = 20.f;
 
-	/*
 	light = new PointLight(world);
-	light->position = glm::vec3(15.f, 0.f, 2.f);
+	light->position = glm::vec3(0.f, 15.f, 2.f);
 	light->color = glm::vec3(1.f, 0.8f, 0.5f);
 	light->intensity = 1.f;
-	light->radius = 20.f;*/
-
+	light->radius = 20.f;
+	/*
 	DirLight* sun = new DirLight(world);
-	sun->rotation = glm::vec3(0.f, 60.f, -30.f);
-	sun->intensity = 2.f;
-	sun->color = glm::vec3(1.f, 1.f, 1.f);
+	sun->rotation = glm::vec3(-60.f, 0.f, -30.f);
+	sun->intensity = 1.5f;
+	sun->color = glm::vec3(0.7f, 0.95f, 1.f);*/
 
 	
 

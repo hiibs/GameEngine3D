@@ -1,0 +1,16 @@
+Types
+	None		0	Name; Type; Position; Rotation; Scale
+	Mesh		1	Name; Type; Position; Rotation; Scale; Solid
+	BoxHull		2	Name; Type; Position; Rotation; Scale
+	PointLight	3	Name; Type; Position; Rotation; Scale; Intensity; Color
+	DirLight	4	Name; Type; Position; Rotation; Scale; Intensity; Color
+	Camera		5	Name; Type; Position; Rotation; Scale
+	
+
+Example:
+
+Player; 2; 0 0 0; 0 0 0; 1 1 1
+	Camera; 5; 0 0 1.6; 90 0 -90; 1 1 1
+		WeaponMesh; 1; 0 0 0; 0 0 0; 1 1 1; false
+		
+Floor; 1; 0 0 -0.5; 0 0 0; 20 20 1; true

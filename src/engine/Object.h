@@ -29,6 +29,7 @@ public:
 
 	glm::mat4 getModelMatrix() const;
 	glm::vec3 getForwardVector() const;
+	glm::vec3 getRightVector() const;
 
 protected:
 	Scene* scene;

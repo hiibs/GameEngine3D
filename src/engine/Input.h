@@ -1,15 +1,31 @@
 #pragma once
-#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
+class GLFWwindow;
 
 enum Button {
-	FORWARD = GLFW_KEY_W,
-	BACK = GLFW_KEY_S,
-	RIGHT = GLFW_KEY_D,
-	LEFT = GLFW_KEY_A,
+	LEFT_CLICK = 0,
+	RIGHT_CLICK = 1,
+	FORWARD = 87,
+	BACK = 83,
+	RIGHT = 68,
+	LEFT = 65
 };
 
 class Input {
 public:
-	static bool isPressed(Button button);
+	Input(GLFWwindow* window);
+
+	void update();
+
+	const bool isPressed(Button button) const;
+	const glm::vec2 getMouseDelta() const;
+	const void enableCursor() const;
+	const void disableCursor() const;
+
+private:
+	GLFWwindow* window;
+	glm::vec2 mouseDelta;
+	glm::vec2 prevMousePos;
 };
 

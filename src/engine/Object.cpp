@@ -75,5 +75,9 @@ glm::mat4 Object::getModelMatrix() const {
 }
 
 glm::vec3 Object::getForwardVector() const {
+	return glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x)) * glm::vec4(0.f, 1.f, 0.f, 1.f);
+}
+
+glm::vec3 Object::getRightVector() const {
 	return glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x)) * glm::vec4(1.f, 0.f, 0.f, 1.f);
 }

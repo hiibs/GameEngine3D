@@ -1,8 +1,8 @@
 #pragma once
 #include "Behaviour.h"
-class PlayerController : public Behaviour {
+class CameraController : public Behaviour {
 public:
-	PlayerController(Object* owner) : Behaviour(owner) {}
+	CameraController(Object* owner) : Behaviour(owner) {}
 
 	virtual void start() override { }
 	virtual void update(float deltaTime) override;
