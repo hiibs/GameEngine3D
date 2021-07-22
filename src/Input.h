@@ -9,7 +9,8 @@ enum Button {
 	FORWARD = 87,
 	BACK = 83,
 	RIGHT = 68,
-	LEFT = 65
+	LEFT = 65,
+	JUMP = 32
 };
 
 class Input {

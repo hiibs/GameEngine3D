@@ -1,7 +1,6 @@
 #include "Engine.h"
 #include "Mesh.h"
-#include "CameraController.h"
-#include "Spin.h"
+#include "Player.h"
 #include <glm/glm.hpp>
 
 int main() {
@@ -13,54 +12,42 @@ int main() {
 	
 	Mesh* floor = new Mesh(world);
 	floor->loadMesh("Box.obj");
-	floor->position = glm::vec3(0.f, 0.f, -0.5f);
-	floor->scale = glm::vec3(40.f, 40.f, 1.f);
+	floor->setPosition(glm::vec3(0.f, 0.f, -0.5f));
+	floor->setScale(glm::vec3(40.f, 40.f, 1.f));
 	floor->material = floorMat;
 
 	Mesh* wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
-	wall->position = glm::vec3(0.f, 10.f, 1.5f);
-	wall->scale = glm::vec3(10.f, 1.f, 3.f);
+	wall->setPosition(glm::vec3(0.f, 10.f, 0.9f));
+	wall->setScale(glm::vec3(10.f, 1.f, 1.8f));
 	wall->material = floorMat;
-	wall->rotation.z = 30.f;
-
-	BoxHull* cameraParent = new BoxHull(world);
-	cameraParent->position = glm::vec3(0.f, 0.f, 1.f);
-	CameraController* controller = new CameraController(cameraParent);
-
-	Camera* camera = new Camera(world);
-	camera->setParent(cameraParent);
-	camera->position = glm::vec3(0.f, 0.f, 0.f);
-	camera->rotation = glm::vec3(90.f, 00.f, 0.f);
+	wall->setRotation(glm::vec3(0.f, 0.f, 30.f));
 	
 	PointLight* light = new PointLight(world);
-	light->position = glm::vec3(0.f, 0.f, 2.f);
+	light->setPosition(glm::vec3(0.f, 0.f, 2.f));
 	light->color = glm::vec3(1.f, 0.8f, 0.5f);
 	light->intensity = 1.f;
 	light->radius = 20.f;
 
 	light = new PointLight(world);
-	light->position = glm::vec3(0.f, 15.f, 2.f);
+	light->setPosition(glm::vec3(0.f, 15.f, 2.f));
 	light->color = glm::vec3(1.f, 0.8f, 0.5f);
 	light->intensity = 1.f;
 	light->radius = 20.f;
 
 	Mesh* monke = new Mesh(world);
-	monke->position = glm::vec3(0.f, 5.f, 1.f);
+	monke->setPosition(glm::vec3(0.f, 5.f, 1.f));
 	monke->loadMesh("Suzanne.obj");
 	monke->material = floorMat;
 
-	Spin* spin = new Spin(monke);
+	Player* player = new Player(world);
+	player->setPosition(glm::vec3(0.f, 0.f, 2.f));
 
 	/*
 	DirLight* sun = new DirLight(world);
 	sun->rotation = glm::vec3(-60.f, 0.f, -30.f);
 	sun->intensity = 1.5f;
 	sun->color = glm::vec3(0.7f, 0.95f, 1.f);*/
-
-	
-
-	world->activeCamera = camera;
 
 	engine->loadScene(world);
 	engine->start();

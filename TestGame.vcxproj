@@ -78,12 +78,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)src\engine;$(SolutionDir)ext\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ext\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\ext\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)src\engine;$(SolutionDir)ext\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ext\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\ext\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -145,29 +145,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\editor\Spin.cpp" />
-    <ClCompile Include="src\engine\Physics.cpp" />
-    <ClCompile Include="src\engine\BoxHull.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
+    <ClCompile Include="src\BoxHull.cpp" />
     <ClCompile Include="ext\include\glad\glad.c" />
     <ClCompile Include="ext\include\glm\detail\glm.cpp" />
-    <ClCompile Include="src\editor\main.cpp" />
-    <ClCompile Include="src\editor\CameraController.cpp" />
-    <ClCompile Include="src\engine\Behaviour.cpp" />
-    <ClCompile Include="src\engine\Camera.cpp" />
-    <ClCompile Include="src\engine\DirLight.cpp" />
-    <ClCompile Include="src\engine\Engine.cpp" />
-    <ClCompile Include="src\engine\Input.cpp" />
-    <ClCompile Include="src\engine\Material.cpp" />
-    <ClCompile Include="src\engine\Mesh.cpp" />
-    <ClCompile Include="src\engine\Object.cpp" />
-    <ClCompile Include="src\engine\PointLight.cpp" />
-    <ClCompile Include="src\engine\Scene.cpp" />
-    <ClCompile Include="src\engine\Texture.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\DirLight.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\PointLight.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\editor\Spin.h" />
-    <ClInclude Include="src\engine\Physics.h" />
-    <ClInclude Include="src\engine\BoxHull.h" />
+    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\Player.h" />
+    <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\BoxHull.h" />
     <ClInclude Include="ext\include\assimp\aabb.h" />
     <ClInclude Include="ext\include\assimp\ai_assert.h" />
     <ClInclude Include="ext\include\assimp\anim.h" />
@@ -532,18 +532,16 @@
     <ClInclude Include="ext\include\glm\vector_relational.hpp" />
     <ClInclude Include="ext\include\KHR\khrplatform.h" />
     <ClInclude Include="ext\include\stb\stb_image.h" />
-    <ClInclude Include="src\editor\CameraController.h" />
-    <ClInclude Include="src\engine\Behaviour.h" />
-    <ClInclude Include="src\engine\Camera.h" />
-    <ClInclude Include="src\engine\DirLight.h" />
-    <ClInclude Include="src\engine\Engine.h" />
-    <ClInclude Include="src\engine\Input.h" />
-    <ClInclude Include="src\engine\Material.h" />
-    <ClInclude Include="src\engine\Mesh.h" />
-    <ClInclude Include="src\engine\Object.h" />
-    <ClInclude Include="src\engine\PointLight.h" />
-    <ClInclude Include="src\engine\Scene.h" />
-    <ClInclude Include="src\engine\Texture.h" />
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\DirLight.h" />
+    <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Object.h" />
+    <ClInclude Include="src\PointLight.h" />
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\Diffuse.glsl" />

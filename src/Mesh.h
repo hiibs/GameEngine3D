@@ -19,20 +19,15 @@ public:
 	
 	Material* material;
 
-	void postUpdate(float deltaTime) override { draw(); }
-
 	void loadMesh(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);
-	void draw();
-
-	void generateShadow();
-	void configureShaderAndMatrices();
-	void renderScene();
 
 	const std::vector<Vertex> getVertices() const;
 	const std::vector<unsigned int> getIndices() const;
 
 	const glm::vec3* getBounds();
+
+	const unsigned int getVAO() const;
 
 private:
 	std::vector<Vertex> vertices;

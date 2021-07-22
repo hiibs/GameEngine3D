@@ -1,7 +1,6 @@
 #include "Scene.h"
 
 Scene::Scene() :
-	activeCamera(nullptr),
 	ambientColor(glm::vec3(0.7f, 0.7f, 1.0f)),
 	ambientIntensity(0.05f)
 {

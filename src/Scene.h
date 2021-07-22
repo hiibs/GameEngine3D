@@ -2,8 +2,9 @@
 #include "PointLight.h"
 #include "DirLight.h"
 #include "Camera.h"
+#include "Mesh.h"
 #include <vector>
-#include <Mesh.h>
+
 
 class Scene {
 public:
@@ -12,7 +13,7 @@ public:
 
 	glm::vec3 ambientColor;
 	float ambientIntensity;
-	Camera* activeCamera;
+	
 
 	void start();
 	void update(float deltaTime);

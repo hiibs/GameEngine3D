@@ -14,13 +14,13 @@ Mesh::Mesh(Scene* scene) :
 {
 	name = "Mesh";
 
-	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(glfwGetCurrentContext()));
-	engine->getPhysics()->addMesh(this);
+	Engine::getInstance()->getPhysics()->addMesh(this);
+	Engine::getInstance()->getRenderer()->addMesh(this);
 }
 
 Mesh::~Mesh() {
-	Engine* engine = static_cast<Engine*>(glfwGetWindowUserPointer(glfwGetCurrentContext()));
-	engine->getPhysics()->removeMesh(this);
+	Engine::getInstance()->getPhysics()->removeMesh(this);
+	Engine::getInstance()->getRenderer()->removeMesh(this);
 }
 
 void Mesh::loadMesh(std::string fileName) {
@@ -126,90 +126,6 @@ void Mesh::processNode(aiNode* node, const aiScene* scene) {
 	}
 }
 
-void Mesh::draw() {
-	if (!scene->activeCamera) {
-		printf("Scene has no active camera!\n");
-		return;
-	}
-
-	glUseProgram(material->shaderProgram);
-
-	glm::mat4 mvp = scene->activeCamera->getProjection() * glm::inverse(scene->activeCamera->getModelMatrix()) * getModelMatrix();
-	glm::mat4 m = getModelMatrix();
-
-	material->setUniform("MVP", mvp);
-	material->setUniform("M", m);
-	
-	material->setUniform("ambientColor", scene->ambientColor);
-	material->setUniform("ambientIntensity", scene->ambientIntensity);
-
-	material->setPointLightsUniform(scene->getPointLights());
-	material->setDirLightsUniform(scene->getDirLights());
-
-	// Set the texture uniform, if texture exists
-	if (material->colorMap->id > 0) {
-		material->setUniform("colorMap", 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, material->colorMap->id);
-	}
-
-	// draw mesh
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-
-	// always good practice to set everything back to defaults once configured.
-	glActiveTexture(GL_TEXTURE0);
-}
-
-void Mesh::generateShadow() {
-	// First we'll create a framebuffer object for rendering the depth map
-	unsigned int depthMapFBO;
-	glGenFramebuffers(1, &depthMapFBO);
-
-
-	// Next we create a 2D texture that we'll use as the framebuffer's depth buffer
-	const unsigned int WIDTH = 1024, HEIGHT = 1024;
-	unsigned int depthMap;
-	glGenTextures(1, &depthMap);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	// With the generated depth texture we can attach it as the framebuffer's depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// 1. first render to depth map
-	glViewport(0, 0, WIDTH, HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	configureShaderAndMatrices();
-	renderScene();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	/*
-	// 2. then render scene as normal with shadow mapping (using depth map)
-	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	configureShaderAndMatrices();
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-	renderScene();*/
-}
-
-void Mesh::configureShaderAndMatrices()
-{
-}
-
-void Mesh::renderScene()
-{
-}
-
 const std::vector<Mesh::Vertex> Mesh::getVertices() const {
 	return std::vector<Vertex>();
 }
@@ -230,9 +146,11 @@ const glm::vec3* Mesh::getBounds() {
 		glm::vec3(localBounds[1].x, localBounds[1].y, localBounds[1].z),
 	};
 
+	glm::mat4 mm = getTransform();
+
 	// Transform to world space
 	for (int i = 0; i < 8; i++) {
-		boxMesh[i] = getModelMatrix() * glm::vec4(boxMesh[i], 1.f);
+		boxMesh[i] = mm * glm::vec4(boxMesh[i], 1.f);
 	}
 
 	
@@ -266,4 +184,8 @@ const glm::vec3* Mesh::getBounds() {
 	};
 
 	return bounds;
+}
+
+const unsigned int Mesh::getVAO() const {
+	return vao;
 }

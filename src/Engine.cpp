@@ -59,11 +59,13 @@ Engine::Engine(int width, int height) :
 
 	input = new Input(window);
 	physics = new Physics();
+	renderer = new Renderer();
 }
 
 Engine::~Engine() {
 	delete input;
 	delete physics;
+	delete renderer;
 }
 
 void Engine::loadScene(Scene* scene) {
@@ -72,16 +74,17 @@ void Engine::loadScene(Scene* scene) {
 
 	int w, h;
 	glfwGetWindowSize(window, &w, &h);
-	if (scene->activeCamera)
-		scene->activeCamera->setAspect(w, h);
+	if (renderer->camera)
+		renderer->camera->setAspect(w, h);
 
 	this->scene = scene;
+	renderer->scene = scene;
 }
 
 void Engine::onWindowSizeChanged(int width, int height) {
 	glViewport(0, 0, width, height);
-	if (scene->activeCamera)
-		scene->activeCamera->setAspect(width, height);
+	if (renderer->camera)
+		renderer->camera->setAspect(width, height);
 }
 
 const Input* Engine::getInput() const {
@@ -90,6 +93,10 @@ const Input* Engine::getInput() const {
 
 Physics* Engine::getPhysics() const {
 	return physics;
+}
+
+Renderer* Engine::getRenderer() const {
+	return renderer;
 }
 
 void Engine::start() {
@@ -124,12 +131,11 @@ void Engine::update(float deltaTime) {
 	// Update physics
 	physics->update();
 
-	// Clear Screen
+	// Rendering
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Draw
-	scene->postUpdate(deltaTime);
+	renderer->drawMeshes();
 
 	glfwSwapBuffers(window);
 }

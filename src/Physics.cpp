@@ -1,15 +1,14 @@
 #include "Physics.h"
 
 void Physics::update() {
-	
 	for (BoxHull* box : boxHulls) {
 		
 		for (Mesh* mesh : meshes) {
 
 			const glm::vec3* bounds = mesh->getBounds();
 			
-			glm::vec3 boxMin = -box->halfExtents * box->scale + box->position;
-			glm::vec3 boxMax = box->halfExtents * box->scale + box->position;
+			glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
+			glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
 			glm::vec3 meshMin = bounds[0];
 			glm::vec3 meshMax = bounds[1];
 
@@ -26,25 +25,15 @@ void Physics::update() {
 				//printf("%f\n", zCorrection);
 
 				if (abs(xCorrection) < abs(yCorrection) && abs(xCorrection) < abs(zCorrection)) {
-					box->position.x += xCorrection;
+					box->move(glm::vec3(xCorrection, 0.f, 0.f));
 				}
 				else if (abs(yCorrection) < abs(xCorrection) && abs(yCorrection) < abs(zCorrection)){
-					box->position.y += yCorrection;
+					box->move(glm::vec3(0.f, yCorrection, 0.f));
 				}
 				else {
-					box->position.z += zCorrection;
+					box->move(glm::vec3(0.f, 0.f, zCorrection));
 				}
 			}
-
-			/*
-			for (int i = 0; i < mesh->getIndices().size(); i += 3) {
-				//Check sphere intersection for each face
-				glm::vec3 face[] = {
-					glm::vec3(mesh->getVertices()[mesh->getIndices()[i]].position),
-					glm::vec3(mesh->getVertices()[mesh->getIndices()[i + 1]].position),
-					glm::vec3(mesh->getVertices()[mesh->getIndices()[i + 2]].position)
-				};
-			}*/
 		}
 	}
 }
