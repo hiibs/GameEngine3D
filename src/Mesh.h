@@ -19,6 +19,8 @@ public:
 	
 	Material* material;
 
+	bool enableCollision;
+
 	void loadMesh(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);
 

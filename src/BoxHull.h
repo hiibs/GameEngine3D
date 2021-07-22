@@ -7,5 +7,7 @@ public:
 	~BoxHull();
 
 	glm::vec3 halfExtents;
+	bool wasResolved;
+	bool isGrounded;
 };
 

@@ -10,7 +10,8 @@
 
 Mesh::Mesh(Scene* scene) :
 	Object(scene),
-	material(nullptr)
+	material(nullptr),
+	enableCollision(true)
 {
 	name = "Mesh";
 

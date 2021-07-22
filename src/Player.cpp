@@ -23,26 +23,44 @@ Player::Player(Scene* scene) : BoxHull(scene),
 
 void Player::update(float deltaTime) {
 	// Update velocity
-	//printf("%f\n", velocity.z);
 	velocity = (getPosition() - lastPosition) / deltaTime;
+
 	lastPosition = getPosition();
 
-	float acceleration = 40.f;
+
+	float acceleration = 60.f;
 	float friction = 8.f;
 
 
 
 	mouseLook();
 
+	if (isGrounded) {
+		velocity += getInputDir() * acceleration * deltaTime;
+		velocity *= glm::clamp(1.f - friction * deltaTime, 0.f, 1.f);
 
-	velocity += getInputDir() * acceleration * deltaTime;
-	velocity *= glm::clamp(1.f - friction * deltaTime, 0.f, 1.f);
+		if (input->isPressed(JUMP))
+			velocity.z = 5.f;
+	}
+	else {
+		velocity.z -= 14.f * deltaTime;
 
-	/*
-	if (input->isPressed(LEFT_CLICK))
-		velocity.z += 20.f * deltaTime;
+		glm::vec3 oldVel = velocity;
+
+
+		float oldSpeed = glm::length(glm::vec3(velocity.x, velocity.y, 0.f));
 		
-	velocity.z -= 10.f * deltaTime;*/
+		velocity += getInputDir() * acceleration * 0.3f * deltaTime;
+
+		glm::vec3 hVel = glm::vec3(velocity.x, velocity.y, 0.f);
+		if (glm::length(glm::vec3(hVel)) > oldSpeed) {
+			glm::vec3 newHVel = glm::normalize(hVel) * oldSpeed;
+			velocity.x = newHVel.x;
+			velocity.y = newHVel.y;
+		}
+	}
+		
+	
 	
 	move(velocity * deltaTime);
 }
@@ -56,13 +74,13 @@ glm::vec3 Player::getInputDir() const {
 	glm::vec3 dir = glm::vec3(0.f);
 
 	if (input->isPressed(FORWARD))
-		dir += camera->getForwardVector();
+		dir += getForwardVector();
 	if (input->isPressed(BACK))
-		dir += -camera->getForwardVector();
+		dir += -getForwardVector();
 	if (input->isPressed(RIGHT))
-		dir += camera->getRightVector();
+		dir += getRightVector();
 	if (input->isPressed(LEFT))
-		dir += -camera->getRightVector();
+		dir += -getRightVector();
 
 	return glm::length(dir) > 0.1f ? glm::normalize(dir) : glm::vec3(0.f);
 }

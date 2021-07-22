@@ -18,10 +18,10 @@ int main() {
 
 	Mesh* wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
-	wall->setPosition(glm::vec3(0.f, 10.f, 0.9f));
-	wall->setScale(glm::vec3(10.f, 1.f, 1.8f));
+	wall->setPosition(glm::vec3(0.f, 10.f, 4.f));
+	wall->setScale(glm::vec3(10.f, 2.f, 4.f));
 	wall->material = floorMat;
-	wall->setRotation(glm::vec3(0.f, 0.f, 30.f));
+	wall->setRotation(glm::vec3(30.f, 15.f, 120.f));
 	
 	PointLight* light = new PointLight(world);
 	light->setPosition(glm::vec3(0.f, 0.f, 2.f));
@@ -39,6 +39,7 @@ int main() {
 	monke->setPosition(glm::vec3(0.f, 5.f, 1.f));
 	monke->loadMesh("Suzanne.obj");
 	monke->material = floorMat;
+	monke->enableCollision = false;
 
 	Player* player = new Player(world);
 	player->setPosition(glm::vec3(0.f, 0.f, 2.f));
