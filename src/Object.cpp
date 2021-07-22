@@ -37,11 +37,13 @@ const glm::mat4 Object::getTransform() const {
 }
 
 glm::vec3 Object::getForwardVector() const {
-	return glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x)) * glm::vec4(0.f, 1.f, 0.f, 1.f);
+	glm::vec4 v = getRotationMatrix() * glm::vec4(0.f, 1.f, 0.f, 1.f);
+	return parent ? parent->getRotationMatrix() * v : v;
 }
 
 glm::vec3 Object::getRightVector() const {
-	return glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x)) * glm::vec4(1.f, 0.f, 0.f, 1.f);
+	glm::vec4 v = getRotationMatrix() * glm::vec4(1.f, 0.f, 0.f, 1.f);
+	return parent ? parent->getRotationMatrix() * v : v;
 }
 
 glm::vec3 Object::getPosition() const {
@@ -54,6 +56,10 @@ glm::vec3 Object::getRotation() const {
 
 glm::vec3 Object::getScale() const {
 	return scale;
+}
+
+glm::mat4 Object::getRotationMatrix() const {
+	return glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x));
 }
 
 void Object::setPosition(glm::vec3 position) {

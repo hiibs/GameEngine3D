@@ -15,6 +15,8 @@ public:
 	void addBoxHull(BoxHull* object);
 	void removeBoxHull(BoxHull* object);
 
+	bool testCollision(const std::vector<glm::vec3>& shapeA, const std::vector<glm::vec3>& shapeB, glm::vec3 normal);
+
 private:
 	std::vector<Mesh*> meshes;
 	std::vector<BoxHull*> boxHulls;

@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 Camera::Camera(Scene* scene) :
 	Object(scene),
@@ -8,11 +9,11 @@ Camera::Camera(Scene* scene) :
 	farClip(1000.f)
 {
 	name = "Camera";
-	projection = glm::perspectiveFov(glm::radians(fov), 1.f, 1.f, nearClip, farClip);
+	projection = glm::mat4();
 }
 
 void Camera::setAspect(int width, int height) {
-	projection = glm::perspectiveFov(glm::radians(fov), (float)width, (float)height, nearClip, farClip);
+	projection = glm::perspectiveFov(glm::radians(fov), (float)width, (float)height, nearClip, farClip) * glm::eulerAngleXYZ(-glm::half_pi<float>(), 0.f, 0.f);
 }
 
 const glm::mat4 Camera::getProjection() const {

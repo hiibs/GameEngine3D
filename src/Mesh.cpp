@@ -43,26 +43,26 @@ void Mesh::loadMesh(std::string fileName) {
 	
 
 	// Find model boundaries
-	float minX = vertices[0].position.x;
-	float minY = vertices[0].position.y;
-	float minZ = vertices[0].position.z;
-	float maxX = vertices[0].position.x;
-	float maxY = vertices[0].position.y;
-	float maxZ = vertices[0].position.z;
+	float minX = vertices[0].x;
+	float minY = vertices[0].y;
+	float minZ = vertices[0].z;
+	float maxX = vertices[0].x;
+	float maxY = vertices[0].y;
+	float maxZ = vertices[0].z;
 
-	for (const Vertex& v : vertices) {
-		if (v.position.x < minX)
-			minX = v.position.x;
-		if (v.position.y < minY)
-			minY = v.position.y;
-		if (v.position.z < minZ)
-			minZ = v.position.z;
-		if (v.position.x > maxX)
-			maxX = v.position.x;
-		if (v.position.y > maxY)
-			maxY = v.position.y;
-		if (v.position.z > maxZ)
-			maxZ = v.position.z;
+	for (const glm::vec3 vert : vertices) {
+		if (vert.x < minX)
+			minX = vert.x;
+		if (vert.y < minY)
+			minY = vert.y;
+		if (vert.z < minZ)
+			minZ = vert.z;
+		if (vert.x > maxX)
+			maxX = vert.x;
+		if (vert.y > maxY)
+			maxY = vert.y;
+		if (vert.z > maxZ)
+			maxZ = vert.z;
 	}
 
 	localBounds[0] = glm::vec3(minX, minY, minZ);
@@ -70,26 +70,41 @@ void Mesh::loadMesh(std::string fileName) {
 
 	// create buffers/arrays
 	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &positionsVbo);
+	glGenBuffers(1, &normalsVbo);
+	glGenBuffers(1, &texCoordsVbo);
 	glGenBuffers(1, &ebo);
 
 	glBindVertexArray(vao);
+
 	// load data into vertex buffers
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	
 
 	// set the vertex attribute pointers
 	// vertex Positions
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVbo);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	
+
 	// vertex texture coords
+	glBindBuffer(GL_ARRAY_BUFFER, texCoordsVbo);
+	glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(glm::vec2), &texCoords[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+	
+
 	// vertex normals
+	glBindBuffer(GL_ARRAY_BUFFER, normalsVbo);
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	
 
 	glBindVertexArray(0);
 }
@@ -100,15 +115,14 @@ void Mesh::processNode(aiNode* node, const aiScene* scene) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
 		for (int j = 0; j < mesh->mNumVertices; j++) {
-			Vertex vertex;
-			vertex.position = glm::vec3(mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z);
 
-			vertex.normal = glm::vec3(mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z);
+			vertices.push_back(glm::vec3(mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z));
+			normals.push_back(glm::vec3(mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z));
 
 			if (mesh->HasTextureCoords(0))
-				vertex.texCoords = glm::vec2(mesh->mTextureCoords[0][j].x, mesh->mTextureCoords[0][j].y);
+				texCoords.push_back(glm::vec2(mesh->mTextureCoords[0][j].x, mesh->mTextureCoords[0][j].y));
 
-			vertices.push_back(vertex);
+			
 		}
 
 		for (int j = 0; j < mesh->mNumFaces; j++) {
@@ -126,11 +140,11 @@ void Mesh::processNode(aiNode* node, const aiScene* scene) {
 	}
 }
 
-const std::vector<Mesh::Vertex> Mesh::getVertices() const {
-	return std::vector<Vertex>();
+const std::vector<glm::vec3>& Mesh::getVertices() const {
+	return vertices;
 }
 
-const std::vector<unsigned int> Mesh::getIndices() const {
+const std::vector<unsigned int>& Mesh::getIndices() const {
 	return indices;
 }
 
