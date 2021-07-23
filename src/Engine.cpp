@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include <iostream>
+#include <Windows.h>
 
 Engine::Engine(int width, int height) :
 	scene(nullptr),
@@ -110,6 +111,8 @@ void Engine::start() {
 		prevTime = curTime;
 
 		update(deltaTime);
+
+		//printf("%i\n", (int)(1.f / deltaTime));
 	}
 }
 
@@ -129,7 +132,7 @@ void Engine::update(float deltaTime) {
 	scene->update(deltaTime);
 
 	// Update physics
-	physics->update();
+	physics->update(deltaTime);
 
 	// Rendering
 	glClearColor(0.f, 0.f, 0.f, 1.0f);

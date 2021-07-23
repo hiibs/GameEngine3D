@@ -9,9 +9,10 @@ public:
 	void setAspect(int width, int height);
 
 	const glm::mat4 getProjection() const;
+	const glm::mat4 getFpModelProjection();
 
 private:
-	glm::mat4 projection;
-	float fov, nearClip, farClip;
+	glm::mat4 projection, fpModelProjection;
+	float fov, nearClip, farClip, fpModelFov;
 };
 

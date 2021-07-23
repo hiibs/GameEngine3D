@@ -6,7 +6,7 @@
 
 class Physics {
 public:
-	void update();
+	void update(float deltaTime);
 	bool lineTrace(glm::vec3 start, glm::vec2 end);
 
 	void addMesh(Mesh* object);

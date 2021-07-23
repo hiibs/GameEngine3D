@@ -7,12 +7,6 @@
 
 class Mesh : public Object {
 public:
-	struct Vertex {
-		glm::vec3 position;
-		glm::vec3 normal;
-		glm::vec2 texCoords;
-	};
-
 	Mesh(Scene* scene);
 	~Mesh();
 
@@ -20,6 +14,7 @@ public:
 	Material* material;
 
 	bool enableCollision;
+	bool fpModel;
 
 	void loadMesh(std::string path);
 	void processNode(aiNode* node, const aiScene* scene);

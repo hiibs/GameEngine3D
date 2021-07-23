@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-void Physics::update() {
+void Physics::update(float deltaTime) {
 	for (BoxHull* box : boxHulls) {
 		box->wasResolved = false;
 		box->isGrounded = false;
@@ -9,14 +9,14 @@ void Physics::update() {
 		glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
 
 		std::vector<glm::vec3> boxCorners = {
-			box->getTransform() * glm::vec4(box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getTransform() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f)
+			box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
+			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f)
 		};
 
 		for (Mesh* mesh : meshes) {
@@ -36,20 +36,22 @@ void Physics::update() {
 
 				std::vector<glm::vec3> meshPoints;
 				for (glm::vec3 vert : mesh->getVertices())
-					meshPoints.push_back(mesh->getTransform() * glm::vec4(vert, 1.f));
-
+					meshPoints.push_back(mesh->getModelMatrix() * glm::vec4(vert, 1.f));
+				
+				//ool isCorner = false;
 				glm::vec3 c(0.f);
+				/*
 				// Check for overlapping vertices
 				if (testVertexOverlap(boxMin, boxMax, meshPoints, c)) {
-					box->move(c);
-					box->wasResolved = true;
-				}
+					bool isCorner = true;
+				}*/
 
 				bool collisionFound = true;
 				
 				float floorNormalZ(-1.f);
 				// Do SAT test
 				glm::vec3 minCorrection(1000.f);
+				
 				for (int i = 0; i < mesh->getIndices().size(); i += 3) {
 					glm::vec3 a = meshPoints[mesh->getIndices()[i]];
 					glm::vec3 b = meshPoints[mesh->getIndices()[i+1]];
@@ -62,41 +64,43 @@ void Physics::update() {
 					if (testSatCollision(boxCorners, meshPoints, faceNormal, c)) {
 						if (glm::length(c) < glm::length(minCorrection))
 							minCorrection = c;
-						if (faceNormal.z > floorNormalZ)
-							floorNormalZ = faceNormal.z;
 					}
-					else {
+					else
 						collisionFound = false;
-					}
 				}
 
 				// Test mesh against AABB on x, y and z axis
-				if (testSatCollision(meshPoints, boxCorners, glm::vec3(1.f, 0.f, 0.f), c)) {
+				if (testSatCollision(boxCorners, meshPoints, glm::vec3(1.f, 0.f, 0.f), c)) {
 					if (glm::length(c) < glm::length(minCorrection))
 						minCorrection = c;
 				}
 				else
 					collisionFound = false;
 
-				if (testSatCollision(meshPoints, boxCorners, glm::vec3(0.f, 1.f, 0.f), c)) {
+				if (testSatCollision(boxCorners, meshPoints, glm::vec3(0.f, 1.f, 0.f), c)) {
 					if (glm::length(c) < glm::length(minCorrection))
 						minCorrection = c;
 				}
 				else
 					collisionFound = false;
 
-				if (testSatCollision(meshPoints, boxCorners, glm::vec3(0.f, 0.f, 1.f), c)) {
+				if (testSatCollision(boxCorners, meshPoints, glm::vec3(0.f, 0.f, 1.f), c)) {
 					if (glm::length(c) < glm::length(minCorrection))
 						minCorrection = c;
 				}
 				else
 					collisionFound = false;
 
+				box->lastCorrection = glm::vec3(0.f);
 				if (collisionFound) {
-					box->move(minCorrection);
-					box->wasResolved = true;
+					/*
+					if (glm::length(minCorrection) > 5.f * deltaTime)
+						box->wasResolved = true;*/
 
-					if (floorNormalZ > 0.7f)
+					box->move(minCorrection);
+					box->lastCorrection = minCorrection;
+
+					if (glm::normalize(minCorrection).z > 0.7f)
 						box->isGrounded = true;
 				}
 			}
@@ -150,17 +154,6 @@ bool Physics::testVertexOverlap(glm::vec3 boxMin, glm::vec3 boxMax, const std::v
 		if (point.x < boxMax.x && point.x > boxMin.x &&
 			point.y < boxMax.y && point.y > boxMin.y &&
 			point.z < boxMax.z && point.z > boxMin.z) {
-
-			float xCorrection = (point.x - boxMin.x) < -(point.x - boxMax.x) ? (point.x - boxMin.x) : (point.x - boxMax.x);
-			float yCorrection = (point.y - boxMin.y) < -(point.y - boxMax.y) ? (point.y - boxMin.y) : (point.y - boxMax.y);
-			float zCorrection = (point.z - boxMin.z) < -(point.z - boxMax.z) ? (point.z - boxMin.z) : (point.z - boxMax.z);
-
-			if (abs(xCorrection) < abs(yCorrection) && abs(xCorrection) < abs(zCorrection))
-				correction = glm::vec3(xCorrection, 0.f, 0.f);
-			else if (abs(yCorrection) < abs(xCorrection) && abs(yCorrection) < abs(zCorrection))
-				correction = glm::vec3(0.f, yCorrection, 0.f);
-			else
-				correction = glm::vec3(0.f, 0.f, zCorrection);
 
 			return true;
 		}

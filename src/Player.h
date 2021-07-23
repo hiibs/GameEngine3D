@@ -2,6 +2,7 @@
 #include "BoxHull.h"
 #include "Camera.h"
 #include "Input.h"
+#include "Mesh.h"
 
 class Player : public BoxHull {
 public:
@@ -9,16 +10,17 @@ public:
 
 	virtual void update(float deltaTime) override;
 
-	
-	virtual void setPosition(glm::vec3 position) override;
 
 private:
 	Camera* camera;
+	Mesh* weapon;
 	const Input* input;
-	glm::vec3 velocity;
-	glm::vec3 lastPosition;
-	
+	float time;
+	glm::vec3 weaponPos;
+	glm::vec3 cameraPos;
+
 	glm::vec3 getInputDir() const;
 	void mouseLook();
+	void updateMovement(float deltaTime);
 };
 

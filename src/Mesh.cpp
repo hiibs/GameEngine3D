@@ -11,7 +11,8 @@
 Mesh::Mesh(Scene* scene) :
 	Object(scene),
 	material(nullptr),
-	enableCollision(true)
+	enableCollision(true),
+	fpModel(false)
 {
 	name = "Mesh";
 
@@ -161,7 +162,7 @@ const glm::vec3* Mesh::getBounds() {
 		glm::vec3(localBounds[1].x, localBounds[1].y, localBounds[1].z),
 	};
 
-	glm::mat4 mm = getTransform();
+	glm::mat4 mm = getModelMatrix();
 
 	// Transform to world space
 	for (int i = 0; i < 8; i++) {

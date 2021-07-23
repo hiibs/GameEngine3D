@@ -20,7 +20,7 @@ public:
 	void setParent(const Object* parent);
 	void clearParent();
 
-	const glm::mat4 getTransform() const;
+	const glm::mat4 getModelMatrix() const;
 
 	glm::vec3 getForwardVector() const;
 	glm::vec3 getRightVector() const;
@@ -48,8 +48,8 @@ private:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	glm::mat4 transform;
+	//glm::mat4 transform;
 
-	void updateTransform();
+	//void updateTransform();
 };
 

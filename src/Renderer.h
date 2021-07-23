@@ -16,5 +16,7 @@ public:
 	Camera* camera;
 private:
 	std::vector<const Mesh*> meshes;
+
+	void draw(const Mesh* mesh, glm::mat4 vp);
 };
 

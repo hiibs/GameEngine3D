@@ -32,8 +32,12 @@ void Object::clearParent(){
 	parent = nullptr;
 }
 
-const glm::mat4 Object::getTransform() const {
-	return transform;
+const glm::mat4 Object::getModelMatrix() const {
+	glm::mat4 t = glm::translate(glm::mat4(1.f), position)
+		* glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x))
+		* glm::scale(glm::mat4(1.0f), scale);
+
+	return parent ? parent->getModelMatrix() * t : t;
 }
 
 glm::vec3 Object::getForwardVector() const {
@@ -64,33 +68,29 @@ glm::mat4 Object::getRotationMatrix() const {
 
 void Object::setPosition(glm::vec3 position) {
 	this->position = position;
-	updateTransform();
 }
 
 void Object::setRotation(glm::vec3 rotation) {
 	this->rotation = rotation;
-	updateTransform();
 }
 
 void Object::setScale(glm::vec3 scale) {
 	this->scale = scale;
-	updateTransform();
 }
 
 void Object::move(glm::vec3 delta) {
 	position += delta;
-	updateTransform();
 }
 
 void Object::rotate(glm::vec3 delta) {
 	rotation += delta;
-	updateTransform();
 }
 
+/*
 void Object::updateTransform() {
 	glm::mat4 t = glm::translate(glm::mat4(1.f), position)
 		* glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x))
 		* glm::scale(glm::mat4(1.0f), scale);
 
 	transform = parent ? parent->getTransform() * t : t;
-}
+}*/

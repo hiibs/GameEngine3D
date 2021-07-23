@@ -7,9 +7,15 @@ int main() {
 	Engine* engine = new Engine();
 	Scene* world = new Scene();
 
-	Texture* floorTex = new Texture("Checkerboard.png");
+	Texture* floorTex = new Texture("Pavement.png");
 	Material* floorMat = new Material(floorTex);
+
+	Texture* wallTex = new Texture("Bricks.png");
+	Material* wallMat = new Material(wallTex);
 	
+	Texture* redTex = new Texture("Red.png");
+	Material* redMat = new Material(redTex);
+
 	Mesh* floor = new Mesh(world);
 	floor->loadMesh("Box.obj");
 	floor->setPosition(glm::vec3(0.f, 0.f, -0.5f));
@@ -18,10 +24,24 @@ int main() {
 
 	Mesh* wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
-	wall->setPosition(glm::vec3(0.f, 10.f, 4.f));
+	wall->setPosition(glm::vec3(0.f, 10.f, 2.f));
 	wall->setScale(glm::vec3(10.f, 2.f, 4.f));
-	wall->material = floorMat;
-	wall->setRotation(glm::vec3(30.f, 15.f, 120.f));
+	wall->material = wallMat;
+	wall->setRotation(glm::vec3(0.f, 0.f, 120.f));
+
+	wall = new Mesh(world);
+	wall->loadMesh("Box.obj");
+	wall->setPosition(glm::vec3(-6.f, 6.f, 3.f));
+	wall->setScale(glm::vec3(6.f, 1.5f, 6.f));
+	wall->material = wallMat;
+	wall->setRotation(glm::vec3(0.f, 0.f, 10.f));
+
+	wall = new Mesh(world);
+	wall->loadMesh("Box.obj");
+	wall->setPosition(glm::vec3(3.f, 1.f, 0.25f));
+	wall->setScale(glm::vec3(4.f, 3.f, 0.5f));
+	wall->material = wallMat;
+	wall->setRotation(glm::vec3(0.f, 0.f, 45.f));
 	
 	PointLight* light = new PointLight(world);
 	light->setPosition(glm::vec3(0.f, 0.f, 2.f));
@@ -38,7 +58,7 @@ int main() {
 	Mesh* monke = new Mesh(world);
 	monke->setPosition(glm::vec3(0.f, 5.f, 1.f));
 	monke->loadMesh("Suzanne.obj");
-	monke->material = floorMat;
+	monke->material = redMat;
 	monke->enableCollision = false;
 
 	Player* player = new Player(world);
