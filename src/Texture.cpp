@@ -20,6 +20,8 @@ void Texture::load() {
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
 
+	printf("%s: %i\n", filePath.c_str(), nrChannels);
+
 	// Create texture
 	glGenTextures(1, &id);
 	// Bind it for use

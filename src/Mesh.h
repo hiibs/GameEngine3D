@@ -24,7 +24,7 @@ public:
 
 	const glm::vec3* getBounds();
 
-	const unsigned int getVAO() const;
+	const unsigned int getVao() const;
 
 private:
 	//std::vector<Vertex> vertices;

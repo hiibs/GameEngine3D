@@ -3,7 +3,8 @@
 #include <fstream>
 
 
-Material::Material(Texture* colorMap, Texture* normalMap, Texture* roughnessMap, Texture* metalnessMap) :
+Material::Material(std::string shaderName, Texture* colorMap, Texture* normalMap, Texture* roughnessMap, Texture* metalnessMap) :
+	shaderName(shaderName),
 	colorMap(colorMap),
 	normalMap(normalMap),
 	roughnessMap(roughnessMap),
@@ -13,8 +14,8 @@ Material::Material(Texture* colorMap, Texture* normalMap, Texture* roughnessMap,
 }
 
 void Material::compileShader() {
-	std::string vertexSourceStr = parseTextFromFile("assets/shaders/Vertex.glsl");
-	std::string fragmentSourceStr = parseTextFromFile("assets/shaders/Diffuse.glsl");
+	std::string vertexSourceStr = parseTextFromFile("assets/shaders/" + shaderName + ".vert");
+	std::string fragmentSourceStr = parseTextFromFile("assets/shaders/" + shaderName + ".frag");
 
 	const char* vertexSource = vertexSourceStr.c_str();
 	const char* fragmentSource = fragmentSourceStr.c_str();
@@ -110,7 +111,7 @@ void Material::setUniform(const std::string& name, glm::vec4 quat) {
 	}
 }
 
-void Material::setUniform(const std::string& name, glm::mat4& m) {
+void Material::setUniform(const std::string& name, const glm::mat4& m) {
 	GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
 	if (loc < 0) {
 		printf("Uniform %s was not found (loc %i)\n", name.c_str(), loc);
@@ -139,7 +140,7 @@ void Material::setUniform(const std::string& name, int value) {
 
 void Material::setPointLightsUniform(const std::vector<PointLight*>& lights) {
 	for (int i = 0; i < std::min(5, (int)lights.size()); i++) {
-		setUniform("pointLights[" + std::to_string(i) + "].position", lights[i]->getPosition());
+		setUniform("pointLights[" + std::to_string(i) + "].position", lights[i]->getWorldPosition());
 		setUniform("pointLights[" + std::to_string(i) + "].color", lights[i]->color);
 		setUniform("pointLights[" + std::to_string(i) + "].intensity", lights[i]->intensity);
 		setUniform("pointLights[" + std::to_string(i) + "].radius", lights[i]->radius);

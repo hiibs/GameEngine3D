@@ -33,7 +33,7 @@ void Mesh::loadMesh(std::string fileName) {
 
 	//read file with Assimp
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_JoinIdenticalVertices);
 
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
@@ -202,6 +202,6 @@ const glm::vec3* Mesh::getBounds() {
 	return bounds;
 }
 
-const unsigned int Mesh::getVAO() const {
+const unsigned int Mesh::getVao() const {
 	return vao;
 }

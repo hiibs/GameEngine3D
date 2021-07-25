@@ -7,7 +7,7 @@
 class Renderer
 {
 public:
-	void drawMeshes();
+	void draw();
 
 	void addMesh(const Mesh* mesh);
 	void removeMesh(const Mesh* mesh);
@@ -17,6 +17,7 @@ public:
 private:
 	std::vector<const Mesh*> meshes;
 
-	void draw(const Mesh* mesh, glm::mat4 vp);
+	void drawMesh(const Mesh* mesh, glm::mat4 vp);
+	void drawOverlay(OverlayImage* overlay);
 };
 

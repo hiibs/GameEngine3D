@@ -20,9 +20,9 @@ void Scene::update(float deltaTime) {
 		obj->update(deltaTime);
 }
 
-void Scene::postUpdate(float deltaTime) {
+void Scene::lateUpdate(float deltaTime) {
 	for (Object* obj : objects)
-		obj->postUpdate(deltaTime);
+		obj->lateUpdate(deltaTime);
 }
 
 void Scene::addObject(Object* object) {

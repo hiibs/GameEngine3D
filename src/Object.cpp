@@ -62,11 +62,15 @@ glm::vec3 Object::getScale() const {
 	return scale;
 }
 
+glm::vec3 Object::getWorldPosition() const {
+	return parent ? parent->getWorldPosition() + position : position;
+}
+
 glm::mat4 Object::getRotationMatrix() const {
 	return glm::eulerAngleZYX(glm::radians(rotation.z), glm::radians(rotation.y), glm::radians(rotation.x));
 }
 
-void Object::setPosition(glm::vec3 position) {
+void Object::setPosition(glm::vec3 position, bool updatePhysics) {
 	this->position = position;
 }
 
@@ -78,7 +82,7 @@ void Object::setScale(glm::vec3 scale) {
 	this->scale = scale;
 }
 
-void Object::move(glm::vec3 delta) {
+void Object::move(glm::vec3 delta, bool updatePhysics) {
 	position += delta;
 }
 

@@ -6,15 +6,17 @@
 int main() {
 	Engine* engine = new Engine();
 	Scene* world = new Scene();
+	world->ambientColor = glm::vec3(0.6f, 0.8f, 1.f);
+	world->ambientIntensity = 0.5f;
 
 	Texture* floorTex = new Texture("Pavement.png");
-	Material* floorMat = new Material(floorTex);
+	Material* floorMat = new Material("Diffuse", floorTex);
 
 	Texture* wallTex = new Texture("Bricks.png");
-	Material* wallMat = new Material(wallTex);
+	Material* wallMat = new Material("Diffuse", wallTex);
 	
 	Texture* redTex = new Texture("Red.png");
-	Material* redMat = new Material(redTex);
+	Material* redMat = new Material("Diffuse", redTex);
 
 	Mesh* floor = new Mesh(world);
 	floor->loadMesh("Box.obj");
@@ -27,7 +29,7 @@ int main() {
 	wall->setPosition(glm::vec3(0.f, 10.f, 2.f));
 	wall->setScale(glm::vec3(10.f, 2.f, 4.f));
 	wall->material = wallMat;
-	wall->setRotation(glm::vec3(0.f, 0.f, 120.f));
+	wall->setRotation(glm::vec3(0.f, 0.f, -60.f));
 
 	wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
@@ -42,24 +44,27 @@ int main() {
 	wall->setScale(glm::vec3(4.f, 3.f, 0.5f));
 	wall->material = wallMat;
 	wall->setRotation(glm::vec3(0.f, 0.f, 45.f));
+
+	wall = new Mesh(world);
+	wall->loadMesh("Box.obj");
+	wall->setPosition(glm::vec3(0.f, -5.f, 0.f));
+	wall->setScale(glm::vec3(10.f, 2.f, 4.f));
+	wall->material = wallMat;
+	wall->setRotation(glm::vec3(70.f, 0.f, 0.f));
 	
-	PointLight* light = new PointLight(world);
-	light->setPosition(glm::vec3(0.f, 0.f, 2.f));
-	light->color = glm::vec3(1.f, 0.8f, 0.5f);
-	light->intensity = 1.f;
-	light->radius = 20.f;
-
-	light = new PointLight(world);
-	light->setPosition(glm::vec3(0.f, 15.f, 2.f));
-	light->color = glm::vec3(1.f, 0.8f, 0.5f);
-	light->intensity = 1.f;
-	light->radius = 20.f;
-
 	Mesh* monke = new Mesh(world);
 	monke->setPosition(glm::vec3(0.f, 5.f, 1.f));
 	monke->loadMesh("Suzanne.obj");
 	monke->material = redMat;
 	monke->enableCollision = false;
+
+	PointLight* light = new PointLight(world);
+	light->setPosition(glm::vec3(0.f, 0.f, 2.f));
+	light->color = glm::vec3(1.f, 0.8f, 0.5f);
+	light->intensity = 1.5f;
+	light->radius = 30.f;
+
+	
 
 	Player* player = new Player(world);
 	player->setPosition(glm::vec3(0.f, 0.f, 2.f));

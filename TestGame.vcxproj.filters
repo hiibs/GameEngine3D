@@ -66,6 +66,12 @@
     <ClCompile Include="src\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OverlayImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
@@ -1202,10 +1208,16 @@
     <ClInclude Include="src\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\CubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OverlayImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\Diffuse.glsl" />
-    <None Include="assets\shaders\Vertex.glsl" />
+    <None Include="assets\shaders\Diffuse.frag" />
+    <None Include="assets\shaders\Diffuse.vert" />
     <None Include="ext\include\assimp\color4.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -1638,5 +1650,7 @@
     <None Include="ext\include\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="assets\shaders\UI.vert" />
+    <None Include="assets\shaders\UI.frag" />
   </ItemGroup>
 </Project>

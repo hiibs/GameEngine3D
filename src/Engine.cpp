@@ -54,6 +54,9 @@ Engine::Engine(int width, int height) :
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Enable raw mouse input
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
@@ -103,16 +106,19 @@ Renderer* Engine::getRenderer() const {
 void Engine::start() {
 	// Get time using glfwGetTime-function, for delta time calculation.
 	float prevTime = (float)glfwGetTime();
+	float deltaTime = 0.f;
 
 	while (!glfwWindowShouldClose(window)) {
 		// Compute application frame time (delta time) and update application
 		float curTime = (float)glfwGetTime();
-		float deltaTime = curTime - prevTime;
+		deltaTime += curTime - prevTime;
 		prevTime = curTime;
 
-		update(deltaTime);
-
-		//printf("%i\n", (int)(1.f / deltaTime));
+		if (deltaTime >= 1.0 / 100.f) {
+			update(deltaTime);
+			deltaTime = 0.f;
+		}
+			
 	}
 }
 
@@ -125,20 +131,29 @@ void Engine::update(float deltaTime) {
 	// Poll other window events.
 	glfwPollEvents();
 
+
+
 	// Update input
 	input->update();
 
+	
 	// Update game logic
 	scene->update(deltaTime);
-
-	// Update physics
-	physics->update(deltaTime);
+	
+	// Update physics (3 steps per frame for consistency)
+	int subSteps = 1;
+	for (int i = 0; i < subSteps; i++) {
+		physics->update(deltaTime / (float)subSteps);
+		
+	}
+	
+	scene->lateUpdate(deltaTime);
 
 	// Rendering
-	glClearColor(0.f, 0.f, 0.f, 1.0f);
+	glClearColor(0.6f, 0.8f, 1.f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	renderer->drawMeshes();
+	renderer->draw();
 
 	glfwSwapBuffers(window);
 }

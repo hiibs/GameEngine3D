@@ -2,8 +2,8 @@
 
 void Physics::update(float deltaTime) {
 	for (BoxHull* box : boxHulls) {
-		box->wasResolved = false;
 		box->isGrounded = false;
+		box->contactNormals.clear();
 
 		glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
 		glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
@@ -39,71 +39,131 @@ void Physics::update(float deltaTime) {
 					meshPoints.push_back(mesh->getModelMatrix() * glm::vec4(vert, 1.f));
 				
 				//ool isCorner = false;
-				glm::vec3 c(0.f);
-				/*
+				
 				// Check for overlapping vertices
-				if (testVertexOverlap(boxMin, boxMax, meshPoints, c)) {
-					bool isCorner = true;
+				/*
+				for (glm::vec3 point : meshPoints) {
+					if (point.x < boxMax.x && point.x > boxMin.x &&
+						point.y < boxMax.y && point.y > boxMin.y &&
+						point.z < boxMax.z && point.z > boxMin.z) {
+
+						glm::vec3 corrections[] = {
+							glm::vec3(-(boxMin.x - point.x), 0.f, 0.f),
+							glm::vec3(boxMax.x - point.x, 0.f, 0.f),
+							glm::vec3(0.f, -(boxMin.y - point.y), 0.f),
+							glm::vec3(0.f, boxMax.y - point.y, 0.f),
+							glm::vec3(0.f, 0.f, -(boxMin.z - point.z)),
+							glm::vec3(0.f, 0.f, boxMax.z - point.z)
+						};
+
+						glm::vec3 correction = corrections[0];
+						for (int i = 1; i < 6; i++) {
+							if (glm::length(corrections[i]) < glm::length(correction))
+								correction = corrections[i];
+						}
+
+						box->move(correction, true);
+
+						goto meshFinished;
+					}
 				}*/
 
-				bool collisionFound = true;
+				bool flipflop = false;
 				
+				// test AABB against every triangle
 				float floorNormalZ(-1.f);
-				// Do SAT test
-				glm::vec3 minCorrection(1000.f);
-				
 				for (int i = 0; i < mesh->getIndices().size(); i += 3) {
-					glm::vec3 a = meshPoints[mesh->getIndices()[i]];
-					glm::vec3 b = meshPoints[mesh->getIndices()[i+1]];
-					glm::vec3 c = meshPoints[mesh->getIndices()[i+2]];
+					glm::vec3 c(0.f);
+					glm::vec3 minCorrection(1000.f);
+					bool collisionFound = true;
+					
+					std::vector<glm::vec3> verts = {
+						meshPoints[mesh->getIndices()[i]],
+						meshPoints[mesh->getIndices()[i + 1]],
+						meshPoints[mesh->getIndices()[i + 2]],
+					};
 
+					glm::vec3 edges[] = {
+						verts[1] - verts[0],
+						verts[2] - verts[1],
+						verts[0] - verts[2]
+					};
+
+					glm::vec3 edgeOrigins[] = {
+						(verts[1] + verts[0]) / 2.f,
+						(verts[2] + verts[1]) / 2.f,
+						(verts[0] + verts[2]) / 2.f
+					};
+
+					glm::vec3 origin = (verts[0] + verts[1] + verts[2]) / 3.f;
+
+					glm::vec3 edgeNormals[3];
+					for (int j = 0; j < 3; j++) {
+						edgeNormals[j] = glm::normalize(edgeOrigins[j] - origin);
+					}
+					
 					// Get face normal
-					glm::vec3 faceNormal = glm::normalize(glm::cross(c-a,b-a));
+					glm::vec3 faceNormal = glm::normalize(glm::cross(edges[0], edges[1]));
+
+
+					glm::vec3 axes[] = {
+						glm::vec3(1.f, 0.f, 0.f),
+						glm::vec3(0.f, 1.f, 0.f),
+						glm::vec3(0.f, 0.f, 1.f)
+					};
+					
+					for (int j = 0; j < 3; j++) {
+						for (int k = 0; k < 3; k++) {
+							glm::vec3 n = glm::cross(edgeNormals[j], axes[k]);
+							if (testSatCollision(boxCorners, verts, n, c)) {
+								if (glm::length(c) < glm::length(minCorrection))
+									minCorrection = c;
+							}
+							else
+								collisionFound = false;
+						}
+					}
+
+					for (int j = 0; j < 3; j++) {
+						if (testSatCollision(boxCorners, verts, axes[j], c)) {
+							if (glm::length(c) < glm::length(minCorrection))
+								minCorrection = c;
+						}
+						else
+							collisionFound = false;
+					}
 
 					// Test AABB against mesh on face normal axis
-					if (testSatCollision(boxCorners, meshPoints, faceNormal, c)) {
+					if (testSatCollision(boxCorners, verts, faceNormal, c)) {
 						if (glm::length(c) < glm::length(minCorrection))
 							minCorrection = c;
 					}
 					else
 						collisionFound = false;
-				}
 
-				// Test mesh against AABB on x, y and z axis
-				if (testSatCollision(boxCorners, meshPoints, glm::vec3(1.f, 0.f, 0.f), c)) {
-					if (glm::length(c) < glm::length(minCorrection))
-						minCorrection = c;
-				}
-				else
-					collisionFound = false;
+					
+					//box->lastCorrection = glm::vec3(0.f);
+					if (collisionFound && glm::dot(box->getPosition() - origin, faceNormal) > 0.f) {
+						//printf("collision found");
+						//box->move(minCorrection, true);
+						//box->lastCorrection = minCorrection;
 
-				if (testSatCollision(boxCorners, meshPoints, glm::vec3(0.f, 1.f, 0.f), c)) {
-					if (glm::length(c) < glm::length(minCorrection))
-						minCorrection = c;
-				}
-				else
-					collisionFound = false;
-
-				if (testSatCollision(boxCorners, meshPoints, glm::vec3(0.f, 0.f, 1.f), c)) {
-					if (glm::length(c) < glm::length(minCorrection))
-						minCorrection = c;
-				}
-				else
-					collisionFound = false;
-
-				box->lastCorrection = glm::vec3(0.f);
-				if (collisionFound) {
-					/*
-					if (glm::length(minCorrection) > 5.f * deltaTime)
-						box->wasResolved = true;*/
-
-					box->move(minCorrection);
-					box->lastCorrection = minCorrection;
-
-					if (glm::normalize(minCorrection).z > 0.7f)
-						box->isGrounded = true;
+						//glm::vec3 correction = glm::dot(-box->velocity, faceNormal) * faceNormal * deltaTime;
+						
+						box->move(minCorrection, false);
+						float pVel = glm::dot(box->velocity, faceNormal);
+						box->velocity -= pVel * faceNormal;
+						
+						if (faceNormal.z > 0.7f) {
+							box->isGrounded = true;
+							//box->velocity += 10.f * -faceNormal * deltaTime;
+							//box->velocity -= correction;
+						}
+						goto meshFinished;
+					}
 				}
 			}
+		meshFinished:;
 		}
 	}
 }
@@ -155,6 +215,23 @@ bool Physics::testVertexOverlap(glm::vec3 boxMin, glm::vec3 boxMax, const std::v
 			point.y < boxMax.y && point.y > boxMin.y &&
 			point.z < boxMax.z && point.z > boxMin.z) {
 
+			glm::vec3 corrections[] = {
+				glm::vec3(boxMin.x - point.x, 0.f, 0.f),
+				glm::vec3(boxMax.x - point.x, 0.f, 0.f),
+				glm::vec3(0.f, boxMin.y - point.y, 0.f),
+				glm::vec3(0.f, boxMax.y - point.y, 0.f),
+				glm::vec3(0.f, 0.f, boxMin.z - point.z),
+				glm::vec3(0.f, 0.f, boxMax.z - point.z)
+			};
+
+			correction = corrections[0];
+			for (int i = 1; i < 6; i++) {
+				if (glm::length(corrections[i]) < glm::length(correction))
+					correction = corrections[i];
+			}
+
+			//box->move(correction, true);
+
 			return true;
 		}
 	}
@@ -186,7 +263,7 @@ bool Physics::testSatCollision(const std::vector<glm::vec3>& shapeA, const std::
 	}
 
 	if (aMin < bMax && aMax > bMin) {
-		float c = abs(bMax - aMin) < abs(bMin - aMax) ? bMax - aMin : bMin - aMax;
+		float c = abs(aMax - bMin) < abs(aMin - bMax) ? -abs(aMax - bMin) : abs(aMin - bMax);
 		correction = c * normal;
 		return true;
 	}

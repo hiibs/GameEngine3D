@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\OverlayImage.cpp" />
+    <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Physics.cpp" />
@@ -164,6 +166,8 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\OverlayImage.h" />
+    <ClInclude Include="src\CubeMap.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Physics.h" />
@@ -544,8 +548,10 @@
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\Diffuse.glsl" />
-    <None Include="assets\shaders\Vertex.glsl" />
+    <None Include="assets\shaders\Diffuse.frag" />
+    <None Include="assets\shaders\Diffuse.vert" />
+    <None Include="assets\shaders\UI.frag" />
+    <None Include="assets\shaders\UI.vert" />
     <None Include="ext\include\assimp\color4.inl" />
     <None Include="ext\include\assimp\material.inl" />
     <None Include="ext\include\assimp\matrix3x3.inl" />

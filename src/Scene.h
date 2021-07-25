@@ -17,7 +17,7 @@ public:
 
 	void start();
 	void update(float deltaTime);
-	void postUpdate(float deltaTime);
+	void lateUpdate(float deltaTime);
 
 	void addObject(Object* object);
 	void removeObject(Object* object);
