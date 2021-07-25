@@ -114,7 +114,7 @@ void Engine::start() {
 		deltaTime += curTime - prevTime;
 		prevTime = curTime;
 
-		if (deltaTime >= 1.0 / 100.f) {
+		if (deltaTime >= 1.0 / 125.f) {
 			update(deltaTime);
 			deltaTime = 0.f;
 		}
@@ -140,6 +140,7 @@ void Engine::update(float deltaTime) {
 	// Update game logic
 	scene->update(deltaTime);
 	
+
 	// Update physics (3 steps per frame for consistency)
 	int subSteps = 1;
 	for (int i = 0; i < subSteps; i++) {

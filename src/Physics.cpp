@@ -5,165 +5,138 @@ void Physics::update(float deltaTime) {
 		box->isGrounded = false;
 		box->contactNormals.clear();
 
-		glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
-		glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
+		for (int i = 0; i < 4; i++) {
+			for (Mesh* mesh : meshes) {
+				if (!mesh->enableCollision)
+					continue;
 
-		std::vector<glm::vec3> boxCorners = {
-			box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
-			box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f)
-		};
+				const glm::vec3* bounds = mesh->getBounds();
 
-		for (Mesh* mesh : meshes) {
-			if (!mesh->enableCollision)
-				continue;
+				glm::vec3 meshMin = bounds[0];
+				glm::vec3 meshMax = bounds[1];
 
-			const glm::vec3* bounds = mesh->getBounds();
-			
-			glm::vec3 meshMin = bounds[0];
-			glm::vec3 meshMax = bounds[1];
+				glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
+				glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
 
-			// Do a AABB test
-			if (boxMin.x < meshMax.x && boxMax.x > meshMin.x &&
-				boxMin.y < meshMax.y && boxMax.y > meshMin.y &&
-				boxMin.z < meshMax.z && boxMax.z > meshMin.z) {
-				
+				std::vector<glm::vec3> boxCorners = {
+					box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
+					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f)
+				};
 
-				std::vector<glm::vec3> meshPoints;
-				for (glm::vec3 vert : mesh->getVertices())
-					meshPoints.push_back(mesh->getModelMatrix() * glm::vec4(vert, 1.f));
-				
-				//ool isCorner = false;
-				
-				// Check for overlapping vertices
-				/*
-				for (glm::vec3 point : meshPoints) {
-					if (point.x < boxMax.x && point.x > boxMin.x &&
-						point.y < boxMax.y && point.y > boxMin.y &&
-						point.z < boxMax.z && point.z > boxMin.z) {
+				// Do a AABB test
 
-						glm::vec3 corrections[] = {
-							glm::vec3(-(boxMin.x - point.x), 0.f, 0.f),
-							glm::vec3(boxMax.x - point.x, 0.f, 0.f),
-							glm::vec3(0.f, -(boxMin.y - point.y), 0.f),
-							glm::vec3(0.f, boxMax.y - point.y, 0.f),
-							glm::vec3(0.f, 0.f, -(boxMin.z - point.z)),
-							glm::vec3(0.f, 0.f, boxMax.z - point.z)
+				if (boxMin.x < meshMax.x && boxMax.x > meshMin.x &&
+					boxMin.y < meshMax.y && boxMax.y > meshMin.y &&
+					boxMin.z < meshMax.z && boxMax.z > meshMin.z) {
+
+
+					std::vector<glm::vec3> meshPoints;
+					for (glm::vec3 vert : mesh->getVertices())
+						meshPoints.push_back(mesh->getModelMatrix() * glm::vec4(vert, 1.f));
+
+
+					// test AABB against every triangle
+					float floorNormalZ(-1.f);
+					for (int i = 0; i < mesh->getIndices().size(); i += 3) {
+						glm::vec3 c(0.f);
+						glm::vec3 minCorrection(1000.f);
+						bool collisionFound = true;
+
+						std::vector<glm::vec3> verts = {
+							meshPoints[mesh->getIndices()[i]],
+							meshPoints[mesh->getIndices()[i + 1]],
+							meshPoints[mesh->getIndices()[i + 2]],
 						};
 
-						glm::vec3 correction = corrections[0];
-						for (int i = 1; i < 6; i++) {
-							if (glm::length(corrections[i]) < glm::length(correction))
-								correction = corrections[i];
+						glm::vec3 edges[] = {
+							verts[1] - verts[0],
+							verts[2] - verts[1],
+							verts[0] - verts[2]
+						};
+
+						glm::vec3 origin = (verts[0] + verts[1] + verts[2]) / 3.f;
+						glm::vec3 faceNormal = glm::normalize(glm::cross(edges[0], edges[1]));
+
+						glm::vec3 edgeOrigins[] = {
+							(verts[1] + verts[0]) / 2.f,
+							(verts[2] + verts[1]) / 2.f,
+							(verts[0] + verts[2]) / 2.f
+						};
+
+						glm::vec3 edgeNormals[3];
+						for (int j = 0; j < 3; j++) {
+							edgeNormals[j] = glm::normalize(edgeOrigins[j] - origin);
 						}
 
-						box->move(correction, true);
+						glm::vec3 axes[] = {
+							glm::vec3(1.f, 0.f, 0.f),
+							glm::vec3(0.f, 1.f, 0.f),
+							glm::vec3(0.f, 0.f, 1.f)
+						};
 
-						goto meshFinished;
-					}
-				}*/
+						bool validFaceNormal = false;
+						for (int i = 0; i < 8; i++) {
+							if (glm::dot(boxCorners[i] - origin, faceNormal) > 0.f) {
+								validFaceNormal = true;
+							}
+						}
+						if (!validFaceNormal)
+							goto nextFace;
 
-				bool flipflop = false;
-				
-				// test AABB against every triangle
-				float floorNormalZ(-1.f);
-				for (int i = 0; i < mesh->getIndices().size(); i += 3) {
-					glm::vec3 c(0.f);
-					glm::vec3 minCorrection(1000.f);
-					bool collisionFound = true;
-					
-					std::vector<glm::vec3> verts = {
-						meshPoints[mesh->getIndices()[i]],
-						meshPoints[mesh->getIndices()[i + 1]],
-						meshPoints[mesh->getIndices()[i + 2]],
-					};
+						// Test for overlaps on cross products of edge normals and aabb axes
+						for (int j = 0; j < 3; j++) {
+							for (int k = 0; k < 3; k++) {
+								glm::vec3 n = glm::normalize(glm::cross(edgeNormals[j], axes[k]));
+								if (testSatCollision(boxCorners, verts, n, c)) {
+									if (glm::length(c) < glm::length(minCorrection))
+										minCorrection = c;
+								}
+								else
+									collisionFound = false;
+							}
+						}
 
-					glm::vec3 edges[] = {
-						verts[1] - verts[0],
-						verts[2] - verts[1],
-						verts[0] - verts[2]
-					};
-
-					glm::vec3 edgeOrigins[] = {
-						(verts[1] + verts[0]) / 2.f,
-						(verts[2] + verts[1]) / 2.f,
-						(verts[0] + verts[2]) / 2.f
-					};
-
-					glm::vec3 origin = (verts[0] + verts[1] + verts[2]) / 3.f;
-
-					glm::vec3 edgeNormals[3];
-					for (int j = 0; j < 3; j++) {
-						edgeNormals[j] = glm::normalize(edgeOrigins[j] - origin);
-					}
-					
-					// Get face normal
-					glm::vec3 faceNormal = glm::normalize(glm::cross(edges[0], edges[1]));
-
-
-					glm::vec3 axes[] = {
-						glm::vec3(1.f, 0.f, 0.f),
-						glm::vec3(0.f, 1.f, 0.f),
-						glm::vec3(0.f, 0.f, 1.f)
-					};
-					
-					for (int j = 0; j < 3; j++) {
-						for (int k = 0; k < 3; k++) {
-							glm::vec3 n = glm::cross(edgeNormals[j], axes[k]);
-							if (testSatCollision(boxCorners, verts, n, c)) {
+						// Test for overlaps on Box axes
+						for (int j = 0; j < 3; j++) {
+							if (testSatCollision(boxCorners, verts, axes[j], c)) {
 								if (glm::length(c) < glm::length(minCorrection))
 									minCorrection = c;
 							}
 							else
 								collisionFound = false;
 						}
-					}
 
-					for (int j = 0; j < 3; j++) {
-						if (testSatCollision(boxCorners, verts, axes[j], c)) {
+						// Test for overlaps on Face normal axis
+						if (testSatCollision(boxCorners, verts, faceNormal, c)) {
 							if (glm::length(c) < glm::length(minCorrection))
 								minCorrection = c;
 						}
 						else
 							collisionFound = false;
-					}
 
-					// Test AABB against mesh on face normal axis
-					if (testSatCollision(boxCorners, verts, faceNormal, c)) {
-						if (glm::length(c) < glm::length(minCorrection))
-							minCorrection = c;
-					}
-					else
-						collisionFound = false;
 
-					
-					//box->lastCorrection = glm::vec3(0.f);
-					if (collisionFound && glm::dot(box->getPosition() - origin, faceNormal) > 0.f) {
-						//printf("collision found");
-						//box->move(minCorrection, true);
-						//box->lastCorrection = minCorrection;
+						if (collisionFound) {
+							box->move(glm::length(minCorrection)* faceNormal, false);
+							
+							
+							float pVel = glm::dot(box->velocity, faceNormal);
+							if (pVel < 0.f)
+								box->velocity -= pVel * faceNormal;
 
-						//glm::vec3 correction = glm::dot(-box->velocity, faceNormal) * faceNormal * deltaTime;
-						
-						box->move(minCorrection, false);
-						float pVel = glm::dot(box->velocity, faceNormal);
-						box->velocity -= pVel * faceNormal;
-						
-						if (faceNormal.z > 0.7f) {
-							box->isGrounded = true;
-							//box->velocity += 10.f * -faceNormal * deltaTime;
-							//box->velocity -= correction;
+							if (faceNormal.z > 0.7f) {
+								box->isGrounded = true;
+							}
 						}
-						goto meshFinished;
+					nextFace:;
 					}
 				}
 			}
-		meshFinished:;
 		}
 	}
 }

@@ -49,12 +49,13 @@ void Player::update(float deltaTime) {
 	updateMovement(deltaTime);
 
 	// View bobbing
-	
 	time += deltaTime * 1.5f;
 	time += glm::length(velocity) / 200.f;
+
+	float speed = glm::length(glm::vec3(velocity.x, velocity.y, 0.f));
 	float intensity = 0.1f;
 	float wepOffset = glm::sin(time * 0.8f) * intensity / 5.f - intensity / 10.f;
-	float camOffset = glm::sin(time * 1.6f) * intensity * glm::length(velocity) / 10.f - intensity / 2.f;
+	float camOffset = glm::sin(time * 1.6f) * intensity * speed / 10.f - intensity / 2.f;
 	weapon->setPosition(glm::vec3(weaponPos.x, weaponPos.y + wepOffset, weaponPos.z));
 	if (isGrounded) {
 		camera->setPosition(glm::vec3(camera->getPosition().x, camera->getPosition().y, cameraPos.z + camOffset));
@@ -78,6 +79,7 @@ void Player::setPosition(glm::vec3 position, bool updatePhysics) {
 void Player::move(glm::vec3 delta, bool updatePhysics) {
 	if (!updatePhysics)
 		lastPosition += delta;
+
 	Object::move(delta, updatePhysics);
 }
 
