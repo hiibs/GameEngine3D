@@ -5,17 +5,9 @@ void Physics::update(float deltaTime) {
 		box->isGrounded = false;
 
 		box->contactNormals.clear();
-		for (Mesh* mesh : meshes) {
-			if (!mesh->enableCollision)
-				continue;
 
-			const glm::vec3* bounds = mesh->getBounds();
-
-			glm::vec3 meshMin = bounds[0];
-			glm::vec3 meshMax = bounds[1];
-
-			glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
-			glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
+		glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
+		glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
 
 		for (int i = 0; i < 4; i++) {
 			for (Mesh* mesh : meshes) {
@@ -157,7 +149,6 @@ void Physics::update(float deltaTime) {
 							box->isGrounded = true;
 						}
 					}
-				nextFace:;
 				}
 			}
 		}
