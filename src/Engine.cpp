@@ -142,16 +142,11 @@ void Engine::update(float deltaTime) {
 	
 
 	// Update physics (3 steps per frame for consistency)
-	int subSteps = 1;
-	for (int i = 0; i < subSteps; i++) {
-		physics->update(deltaTime / (float)subSteps);
-		
-	}
-	
+	physics->update(deltaTime);
 	scene->lateUpdate(deltaTime);
 
 	// Rendering
-	glClearColor(0.6f, 0.8f, 1.f, 1.0f);
+	glClearColor(0.4f, 0.65f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	renderer->draw();

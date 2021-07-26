@@ -4,137 +4,132 @@ void Physics::update(float deltaTime) {
 	for (BoxHull* box : boxHulls) {
 		box->isGrounded = false;
 		box->contactNormals.clear();
+		for (Mesh* mesh : meshes) {
+			if (!mesh->enableCollision)
+				continue;
 
-		for (int i = 0; i < 4; i++) {
-			for (Mesh* mesh : meshes) {
-				if (!mesh->enableCollision)
-					continue;
+			const glm::vec3* bounds = mesh->getBounds();
 
-				const glm::vec3* bounds = mesh->getBounds();
+			glm::vec3 meshMin = bounds[0];
+			glm::vec3 meshMax = bounds[1];
 
-				glm::vec3 meshMin = bounds[0];
-				glm::vec3 meshMax = bounds[1];
+			glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
+			glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
 
-				glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
-				glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
+			std::vector<glm::vec3> boxCorners = {
+				box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
+				box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f)
+			};
 
-				std::vector<glm::vec3> boxCorners = {
-					box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, box->halfExtents.y, -box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, box->halfExtents.z, 1.f),
-					box->getModelMatrix() * glm::vec4(-box->halfExtents.x, -box->halfExtents.y, -box->halfExtents.z, 1.f)
-				};
+			// Do a AABB test
 
-				// Do a AABB test
-
-				if (boxMin.x < meshMax.x && boxMax.x > meshMin.x &&
-					boxMin.y < meshMax.y && boxMax.y > meshMin.y &&
-					boxMin.z < meshMax.z && boxMax.z > meshMin.z) {
+			if (boxMin.x < meshMax.x && boxMax.x > meshMin.x &&
+				boxMin.y < meshMax.y && boxMax.y > meshMin.y &&
+				boxMin.z < meshMax.z && boxMax.z > meshMin.z) {
 
 
-					std::vector<glm::vec3> meshPoints;
-					for (glm::vec3 vert : mesh->getVertices())
-						meshPoints.push_back(mesh->getModelMatrix() * glm::vec4(vert, 1.f));
+				std::vector<glm::vec3> meshPoints;
+				for (glm::vec3 vert : mesh->getVertices())
+					meshPoints.push_back(mesh->getModelMatrix() * glm::vec4(vert, 1.f));
 
 
-					// test AABB against every triangle
-					float floorNormalZ(-1.f);
-					for (int i = 0; i < mesh->getIndices().size(); i += 3) {
-						glm::vec3 c(0.f);
-						glm::vec3 minCorrection(1000.f);
-						bool collisionFound = true;
+				// test AABB against every triangle
+				float floorNormalZ(-1.f);
+				for (int i = 0; i < mesh->getIndices().size(); i += 3) {
+					glm::vec3 c(0.f);
+					glm::vec3 minCorrection(1000.f);
+					bool collisionFound = true;
 
-						std::vector<glm::vec3> verts = {
-							meshPoints[mesh->getIndices()[i]],
-							meshPoints[mesh->getIndices()[i + 1]],
-							meshPoints[mesh->getIndices()[i + 2]],
-						};
+					std::vector<glm::vec3> verts = {
+						meshPoints[mesh->getIndices()[i]],
+						meshPoints[mesh->getIndices()[i + 1]],
+						meshPoints[mesh->getIndices()[i + 2]],
+					};
 
-						glm::vec3 edges[] = {
-							verts[1] - verts[0],
-							verts[2] - verts[1],
-							verts[0] - verts[2]
-						};
+					glm::vec3 edges[] = {
+						verts[1] - verts[0],
+						verts[2] - verts[1],
+						verts[0] - verts[2]
+					};
 
-						glm::vec3 origin = (verts[0] + verts[1] + verts[2]) / 3.f;
-						glm::vec3 faceNormal = glm::normalize(glm::cross(edges[0], edges[1]));
+					glm::vec3 origin = (verts[0] + verts[1] + verts[2]) / 3.f;
+					glm::vec3 faceNormal = glm::normalize(glm::cross(edges[0], edges[1]));
 
-						glm::vec3 edgeOrigins[] = {
-							(verts[1] + verts[0]) / 2.f,
-							(verts[2] + verts[1]) / 2.f,
-							(verts[0] + verts[2]) / 2.f
-						};
+					glm::vec3 edgeOrigins[] = {
+						(verts[1] + verts[0]) / 2.f,
+						(verts[2] + verts[1]) / 2.f,
+						(verts[0] + verts[2]) / 2.f
+					};
 
-						glm::vec3 edgeNormals[3];
-						for (int j = 0; j < 3; j++) {
-							edgeNormals[j] = glm::normalize(edgeOrigins[j] - origin);
+					glm::vec3 edgeNormals[3];
+					for (int j = 0; j < 3; j++) {
+						edgeNormals[j] = glm::normalize(edgeOrigins[j] - origin);
+					}
+
+					glm::vec3 axes[] = {
+						glm::vec3(1.f, 0.f, 0.f),
+						glm::vec3(0.f, 1.f, 0.f),
+						glm::vec3(0.f, 0.f, 1.f)
+					};
+
+					bool validFaceNormal = false;
+					for (int i = 0; i < 8; i++) {
+						if (glm::dot(boxCorners[i] - origin, faceNormal) > 0.f) {
+							validFaceNormal = true;
 						}
+					}
+					if (!validFaceNormal)
+						goto nextFace;
 
-						glm::vec3 axes[] = {
-							glm::vec3(1.f, 0.f, 0.f),
-							glm::vec3(0.f, 1.f, 0.f),
-							glm::vec3(0.f, 0.f, 1.f)
-						};
-
-						bool validFaceNormal = false;
-						for (int i = 0; i < 8; i++) {
-							if (glm::dot(boxCorners[i] - origin, faceNormal) > 0.f) {
-								validFaceNormal = true;
-							}
-						}
-						if (!validFaceNormal)
-							goto nextFace;
-
-						// Test for overlaps on cross products of edge normals and aabb axes
-						for (int j = 0; j < 3; j++) {
-							for (int k = 0; k < 3; k++) {
-								glm::vec3 n = glm::normalize(glm::cross(edgeNormals[j], axes[k]));
-								if (testSatCollision(boxCorners, verts, n, c)) {
-									if (glm::length(c) < glm::length(minCorrection))
-										minCorrection = c;
-								}
-								else
-									collisionFound = false;
-							}
-						}
-
-						// Test for overlaps on Box axes
-						for (int j = 0; j < 3; j++) {
-							if (testSatCollision(boxCorners, verts, axes[j], c)) {
+					// Test for overlaps on cross products of edge normals and aabb axes
+					for (int j = 0; j < 3; j++) {
+						for (int k = 0; k < 3; k++) {
+							glm::vec3 n = glm::normalize(glm::cross(edgeNormals[j], axes[k]));
+							if (testSatCollision(boxCorners, verts, n, c)) {
 								if (glm::length(c) < glm::length(minCorrection))
 									minCorrection = c;
 							}
 							else
 								collisionFound = false;
 						}
+					}
 
-						// Test for overlaps on Face normal axis
-						if (testSatCollision(boxCorners, verts, faceNormal, c)) {
+					// Test for overlaps on Box axes
+					for (int j = 0; j < 3; j++) {
+						if (testSatCollision(boxCorners, verts, axes[j], c)) {
 							if (glm::length(c) < glm::length(minCorrection))
 								minCorrection = c;
 						}
 						else
 							collisionFound = false;
-
-
-						if (collisionFound) {
-							box->move(glm::length(minCorrection)* faceNormal, false);
-							
-							
-							float pVel = glm::dot(box->velocity, faceNormal);
-							if (pVel < 0.f)
-								box->velocity -= pVel * faceNormal;
-
-							if (faceNormal.z > 0.7f) {
-								box->isGrounded = true;
-							}
-						}
-					nextFace:;
 					}
+
+					// Test for overlaps on Face normal axis
+					if (testSatCollision(boxCorners, verts, faceNormal, c)) {
+						if (glm::length(c) < glm::length(minCorrection))
+							minCorrection = c;
+					}
+					else
+						collisionFound = false;
+
+
+					if (collisionFound) {
+						box->move(glm::length(minCorrection)* faceNormal, false);
+
+						float pVel = glm::dot(box->velocity, faceNormal);
+						box->velocity -= pVel * faceNormal;
+
+						if (faceNormal.z > 0.7f) {
+							box->isGrounded = true;
+						}
+					}
+				nextFace:;
 				}
 			}
 		}
