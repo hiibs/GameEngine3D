@@ -40,8 +40,8 @@ int main() {
 
 	wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
-	wall->setPosition(glm::vec3(8.f, 1.f, 0.25f));
-	wall->setScale(glm::vec3(4.f, 3.f, 0.5f));
+	wall->setPosition(glm::vec3(3.f, 1.f, 0.25f));
+	wall->setScale(glm::vec3(4.f, 3.f, 3.f));
 	wall->material = wallMat;
 	wall->setRotation(glm::vec3(0.f, 0.f, 30.f));
 

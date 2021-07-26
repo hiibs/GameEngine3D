@@ -136,13 +136,19 @@ void Engine::update(float deltaTime) {
 	// Update input
 	input->update();
 
-	
 	// Update game logic
 	scene->update(deltaTime);
 	
-
+	
 	// Update physics (3 steps per frame for consistency)
-	physics->update(deltaTime);
+	int subSteps = 1;
+	for (int i = 0; i < subSteps; i++) {
+		physics->update(deltaTime / (float)subSteps);
+		
+	}
+
+	
+	
 	scene->lateUpdate(deltaTime);
 
 	// Rendering
