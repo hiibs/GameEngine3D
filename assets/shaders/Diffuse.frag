@@ -20,6 +20,7 @@ uniform int numDirLights;
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
 uniform sampler2D colorMap;
+uniform vec4 tint;
 
 
 in vec3 normal;
@@ -53,5 +54,5 @@ void main() {
 	lightResult += ambientColor * ambientIntensity;
 
 
-	FragColor = vec4(lightResult * vec3(texture(colorMap, texCoord)), 0.0);
+	FragColor = vec4(lightResult, 1.0f) * texture2D(colorMap, texCoord) * tint;
 }

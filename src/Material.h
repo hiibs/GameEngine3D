@@ -15,6 +15,8 @@ public:
 	Texture* roughnessMap;
 	Texture* metalnessMap;
 
+	glm::vec4 tint;
+
 	int shaderProgram;
 	std::string shaderName;
 

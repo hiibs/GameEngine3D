@@ -9,7 +9,6 @@ public:
 	Player(Scene* scene);
 
 	virtual void update(float deltaTime) override;
-	virtual void lateUpdate(float deltaTime) override;
 	virtual void setPosition(glm::vec3 position, bool updatePhysics = false) override;
 	virtual void move(glm::vec3 delta, bool updatePhysics = false) override;
 

@@ -90,6 +90,14 @@ void Object::rotate(glm::vec3 delta) {
 	rotation += delta;
 }
 
+void Object::lookAt(glm::vec3 target) {
+	glm::mat4 m = glm::lookAt(position, target, glm::vec3(0.f, 0.f, 1.f));
+	
+	rotation.x = glm::atan(m[1][2], m[2][2]);
+	rotation.y = glm::atan(-m[0][2], glm::sqrt(glm::pow(m[1][2], 2.f) + glm::pow(m[2][2], 2.f)));
+	rotation.z = glm::atan(m[1][0], m[0][0]);
+}
+
 /*
 void Object::updateTransform() {
 	glm::mat4 t = glm::translate(glm::mat4(1.f), position)

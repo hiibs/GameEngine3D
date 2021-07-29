@@ -72,6 +72,12 @@
     <ClCompile Include="src\OverlayImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Billboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Puff.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
@@ -1212,6 +1218,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OverlayImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Billboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Puff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

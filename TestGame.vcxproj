@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Puff.cpp" />
+    <ClCompile Include="src\Billboard.cpp" />
     <ClCompile Include="src\OverlayImage.cpp" />
     <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -166,6 +168,8 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Puff.h" />
+    <ClInclude Include="src\Billboard.h" />
     <ClInclude Include="src\OverlayImage.h" />
     <ClInclude Include="src\CubeMap.h" />
     <ClInclude Include="src\Renderer.h" />

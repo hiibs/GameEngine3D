@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Engine.h"
 #include "OverlayImage.h"
+#include "Puff.h"
 #include <glm/gtx/euler_angles.hpp>
 
 Player::Player(Scene* scene) : BoxHull(scene),
@@ -69,29 +70,23 @@ void Player::update(float deltaTime) {
 		glm::vec3 end = camera->getWorldPosition() + camera->getForwardVector() * 10.f;
 
 		Object* hitObject = nullptr;
-		glm::vec3 hitPos;
+		glm::vec3 hitPos, hitNormal;
 		
 		
 
-		if (Engine::getInstance()->getPhysics()->raycast(start, end, hitObject, hitPos)) {
-
-			Texture* redTex = new Texture("Red.png");
-			Material* redMat = new Material("Diffuse", redTex);
-			Mesh* monkey = new Mesh(scene);
-			monkey->enableCollision = false;
-			monkey->material = redMat;
-			monkey->loadMesh("Suzanne.obj");
-			monkey->setPosition(hitPos);
-			printf("%f %f %f\n", hitPos.x, hitPos.y, hitPos.z);
+		if (Engine::getInstance()->getPhysics()->raycast(start, end, hitObject, hitNormal, hitPos)) {
+			Puff* puff = new Puff(scene);
+			puff->setPosition(glm::vec3(hitPos));
+			puff->direction = hitNormal;
 		}
 
 	}
-
-}
-
-void Player::lateUpdate(float deltaTime) {
 	move(velocity * deltaTime, true);
 }
+/*
+void Player::lateUpdate(float deltaTime) {
+	
+}*/
 
 void Player::setPosition(glm::vec3 position, bool updatePhysics) {
 	if (!updatePhysics) {

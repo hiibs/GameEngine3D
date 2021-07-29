@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Mesh.h"
 #include "Player.h"
+#include "Billboard.h"
 #include <glm/glm.hpp>
 
 int main() {
@@ -64,6 +65,9 @@ int main() {
 	light->intensity = 1.5f;
 	light->radius = 30.f;
 
+	Billboard* b = new Billboard(world);
+	b->material = floorMat;
+	b->setPosition(glm::vec3(0.f, 1.f, 1.f));
 	
 
 	Player* player = new Player(world);

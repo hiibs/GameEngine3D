@@ -273,7 +273,7 @@ bool Physics::testSatCollision(const std::vector<glm::vec3>& shapeA, const std::
 		return false;
 }
 
-bool Physics::raycast(glm::vec3 start, glm::vec3 end, Object* hitObject, glm::vec3& hitPosition) {
+bool Physics::raycast(glm::vec3 start, glm::vec3 end, Object* hitObject, glm::vec3& hitNormal, glm::vec3& hitPosition) {
 
 	glm::vec3 dir = glm::normalize(end - start);
 	float distance = glm::length(end - start);
@@ -323,6 +323,7 @@ bool Physics::raycast(glm::vec3 start, glm::vec3 end, Object* hitObject, glm::ve
 			if (rayT < distance && rayT > 0.f) {
 				hitObject = mesh;
 				hitPosition = verts[0] + edge1 * baryU + edge2 * baryV;
+				hitNormal = glm::normalize(glm::cross(edge1, edge2));
 				return true;
 			}
 		}

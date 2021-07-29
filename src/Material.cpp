@@ -8,7 +8,8 @@ Material::Material(std::string shaderName, Texture* colorMap, Texture* normalMap
 	colorMap(colorMap),
 	normalMap(normalMap),
 	roughnessMap(roughnessMap),
-	metalnessMap(metalnessMap)
+	metalnessMap(metalnessMap),
+	tint(1.f)
 {
 	compileShader();
 }

@@ -39,7 +39,6 @@ void Scene::addObject(Object* object) {
 void Scene::removeObject(Object* object) {
 	for (int i = 0; i < objects.size(); i++) {
 		if (objects[i] == object) {
-			delete object;
 			objects.erase(objects.begin() + i);
 			return;
 		}

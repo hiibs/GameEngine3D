@@ -57,6 +57,7 @@ Engine::Engine(int width, int height) :
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
 	glEnable(GL_POLYGON_SMOOTH);
 
 	// Enable raw mouse input
@@ -151,7 +152,7 @@ void Engine::update(float deltaTime) {
 
 	
 	
-	scene->lateUpdate(deltaTime);
+	//scene->lateUpdate(deltaTime);
 
 	// Rendering
 	glClearColor(0.4f, 0.65f, 0.8f, 1.0f);

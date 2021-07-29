@@ -17,7 +17,7 @@ public:
 
 	bool testVertexOverlap(glm::vec3 boxMin, glm::vec3 boxMax, const std::vector<glm::vec3>& points, glm::vec3& correction);
 	bool testSatCollision(const std::vector<glm::vec3>& shapeA, const std::vector<glm::vec3>& shapeB, glm::vec3 normal, glm::vec3& correction);
-	bool raycast(glm::vec3 start, glm::vec3 end, Object* hitObject, glm::vec3& position);
+	bool raycast(glm::vec3 start, glm::vec3 end, Object* hitObject, glm::vec3& hitNormal, glm::vec3& position);
 
 
 private:

@@ -37,8 +37,11 @@ public:
 	virtual void setRotation(glm::vec3 rotation);
 	virtual void setScale(glm::vec3 scale);
 
+
+
 	virtual void move(glm::vec3 delta, bool updatePhysics = false);
 	void rotate(glm::vec3 delta);
+	void lookAt(glm::vec3 target);
 
 protected:
 	Scene* scene;
