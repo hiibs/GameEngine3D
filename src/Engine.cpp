@@ -18,7 +18,7 @@ Engine::Engine(int width, int height) :
 	}
 
 	// Create window and check that creation was succesful.
-	window = glfwCreateWindow(width, height, "OpenGL window", NULL, NULL);
+	window = glfwCreateWindow(width, height, "Leka3D", NULL, NULL);
 	if (!window) {
 		std::cout << "Failed  to create glfw window!";
 		glfwTerminate();
@@ -56,6 +56,8 @@ Engine::Engine(int width, int height) :
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_POLYGON_SMOOTH);
 
 	// Enable raw mouse input
 	if (glfwRawMouseMotionSupported())

@@ -7,7 +7,8 @@
 Player::Player(Scene* scene) : BoxHull(scene),
 	time(0.f),
 	weaponPos(glm::vec3(0.05f, 0.15f, -0.12f)),
-	cameraPos(glm::vec3(0.f, 0.f, 0.7f))
+	cameraPos(glm::vec3(0.f, 0.f, 0.7f)),
+	shoot(false)
 {
 	// Set player size
 	halfExtents = glm::vec3(0.4f, 0.4f, 0.9f);
@@ -51,7 +52,6 @@ void Player::update(float deltaTime) {
 	// View bobbing
 	time += deltaTime * 1.5f;
 	time += glm::length(velocity) / 200.f;
-
 	float speed = glm::length(glm::vec3(velocity.x, velocity.y, 0.f));
 	float intensity = 0.1f;
 	float wepOffset = glm::sin(time * 0.8f) * intensity / 5.f - intensity / 10.f;
@@ -59,6 +59,32 @@ void Player::update(float deltaTime) {
 	weapon->setPosition(glm::vec3(weaponPos.x, weaponPos.y + wepOffset, weaponPos.z));
 	if (isGrounded) {
 		camera->setPosition(glm::vec3(camera->getPosition().x, camera->getPosition().y, cameraPos.z + camOffset));
+	}
+
+	
+
+	// Shoot
+	if (input->isPressed(LEFT_CLICK)) {
+		glm::vec3 start = camera->getWorldPosition();
+		glm::vec3 end = camera->getWorldPosition() + camera->getForwardVector() * 10.f;
+
+		Object* hitObject = nullptr;
+		glm::vec3 hitPos;
+		
+		
+
+		if (Engine::getInstance()->getPhysics()->raycast(start, end, hitObject, hitPos)) {
+
+			Texture* redTex = new Texture("Red.png");
+			Material* redMat = new Material("Diffuse", redTex);
+			Mesh* monkey = new Mesh(scene);
+			monkey->enableCollision = false;
+			monkey->material = redMat;
+			monkey->loadMesh("Suzanne.obj");
+			monkey->setPosition(hitPos);
+			printf("%f %f %f\n", hitPos.x, hitPos.y, hitPos.z);
+		}
+
 	}
 
 }
@@ -114,6 +140,7 @@ void Player::updateMovement(float deltaTime) {
 	float friction = 60.f;
 	float runSpeed = 10.f;
 	bool crouched = false;
+	glm::vec3 hVel = glm::vec3(velocity.x, velocity.y, 0.f);
 	
 	//velocity -= lastCorrection;
 
@@ -132,7 +159,8 @@ void Player::updateMovement(float deltaTime) {
 	if (isGrounded) {
 		velocity += getInputDir() * acceleration * deltaTime;
 
-		glm::vec3 hVel = glm::vec3(velocity.x, velocity.y, 0.f);
+		hVel = glm::vec3(velocity.x, velocity.y, 0.f);
+
 		if (glm::length(glm::vec3(hVel)) > runSpeed) {
 			glm::vec3 newHVel = glm::normalize(hVel) * runSpeed;
 			velocity.x = newHVel.x;
@@ -145,10 +173,6 @@ void Player::updateMovement(float deltaTime) {
 		else
 			velocity = glm::vec3(0.f);
 		
-		/*
-		if (glm::length(velocity) < 40.f * deltaTime)
-			velocity = glm::vec3(0.f);
-		*/
 		if (input->isPressed(JUMP) && !crouched) {
 			move(glm::vec3(0.f, 0.f, 0.1f));
 			velocity.z = 6.f;
@@ -162,7 +186,8 @@ void Player::updateMovement(float deltaTime) {
 
 		float oldSpeed = glm::length(glm::vec3(velocity.x, velocity.y, 0.f));
 		velocity += getInputDir() * acceleration * 0.3f * deltaTime;
-
+		
+		
 		glm::vec3 hVel = glm::vec3(velocity.x, velocity.y, 0.f);
 		if (glm::length(glm::vec3(hVel)) > oldSpeed) {
 			glm::vec3 newHVel = glm::normalize(hVel) * oldSpeed;

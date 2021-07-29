@@ -9,7 +9,7 @@ void Physics::update(float deltaTime) {
 		glm::vec3 boxMin = -box->halfExtents * box->getScale() + box->getPosition();
 		glm::vec3 boxMax = box->halfExtents * box->getScale() + box->getPosition();
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
 			for (Mesh* mesh : meshes) {
 				if (!mesh->enableCollision)
 					continue;
@@ -22,6 +22,7 @@ void Physics::update(float deltaTime) {
 				glm::vec3 meshMax = bounds[1];
 
 				// Do a AABB test
+				
 				if (boxMin.x < meshMax.x && boxMax.x > meshMin.x &&
 					boxMin.y < meshMax.y && boxMax.y > meshMin.y &&
 					boxMin.z < meshMax.z && boxMax.z > meshMin.z) {
@@ -92,7 +93,11 @@ void Physics::update(float deltaTime) {
 						
 						for (int j = 0; j < 3; j++) {
 							for (int k = 0; k < 3; k++) {
-								glm::vec3 n = glm::cross(edgeNormals[j], axes[k]);
+								// Ignore parallel axes
+								if (abs(glm::dot(axes[j], edgeNormals[k])) > 0.99f)
+									continue;
+
+								glm::vec3 n = glm::cross(axes[j], edgeNormals[k]);
 								if (testSatCollision(boxCorners, verts, n, c)) {
 									if (glm::length(c) < glm::length(minCorrection))
 										minCorrection = c;
@@ -103,7 +108,7 @@ void Physics::update(float deltaTime) {
 						}
 
 						for (int j = 0; j < 3; j++) {
-							if (testSatCollision(boxCorners, verts, axes[j], c)) {
+							if (testSatCollision(boxCorners, verts, edgeNormals[j], c)) {
 								if (glm::length(c) < glm::length(minCorrection))
 									minCorrection = c;
 							}
@@ -111,6 +116,16 @@ void Physics::update(float deltaTime) {
 								collisionFound = false;
 						}
 
+
+						for (int j = 0; j < 3; j++) {
+							if (testSatCollision(boxCorners, verts, axes[j], c)) {
+								if (glm::length(c) < glm::length(minCorrection))
+									minCorrection = c;
+							}
+							else
+								collisionFound = false;
+						}
+						
 						// Test AABB against mesh on face normal axis
 						if (testSatCollision(boxCorners, verts, faceNormal, c)) {
 							if (glm::length(c) < glm::length(minCorrection))
@@ -118,7 +133,7 @@ void Physics::update(float deltaTime) {
 						}
 						else
 							collisionFound = false;
-
+						
 
 						//box->lastCorrection = glm::vec3(0.f);
 						if (collisionFound && glm::dot(box->getPosition() - origin, faceNormal) > 0.f) {
@@ -145,7 +160,7 @@ void Physics::update(float deltaTime) {
 							box->velocity -= pVel * contactNormal;
 
 
-						if (contactNormal.z > 0.9f) {
+						if (contactNormal.z > 0.7f) {
 							box->isGrounded = true;
 						}
 					}
@@ -256,4 +271,61 @@ bool Physics::testSatCollision(const std::vector<glm::vec3>& shapeA, const std::
 	}
 	else
 		return false;
+}
+
+bool Physics::raycast(glm::vec3 start, glm::vec3 end, Object* hitObject, glm::vec3& hitPosition) {
+
+	glm::vec3 dir = glm::normalize(end - start);
+	float distance = glm::length(end - start);
+
+	for (Mesh* mesh : meshes) {
+
+		std::vector<glm::vec3> meshPoints;
+		glm::mat4 meshM = mesh->getModelMatrix();
+		for (glm::vec3 vert : mesh->getVertices())
+			meshPoints.push_back(meshM * glm::vec4(vert, 1.f));
+
+		for (int i = 0; i < mesh->getIndices().size(); i += 3) {
+			glm::vec3 verts[] = {
+				meshPoints[mesh->getIndices()[i]],
+				meshPoints[mesh->getIndices()[i + 1]],
+				meshPoints[mesh->getIndices()[i + 2]],
+			};
+
+			glm::vec3 edge1 = verts[1] - verts[0];
+			glm::vec3 edge2 = verts[2] - verts[0];
+
+			glm::vec3 pVec = glm::cross(dir, edge2);
+
+			float det = glm::dot(edge1, pVec);
+
+			if (det < 0.000001f)
+				continue;
+
+			glm::vec3 tVec = start - verts[0];
+
+			float baryU = glm::dot(tVec, pVec);
+			if (baryU < 0.f || baryU > det)
+				continue;
+
+			glm::vec3 qVec = glm::cross(tVec, edge1);
+
+			float baryV = glm::dot(dir, qVec);
+			if (baryV < 0.f || baryU + baryV > det)
+				continue;
+
+			float rayT = glm::dot(edge2, qVec);
+			float invDet = 1.f / det;
+			rayT *= invDet;
+			baryU *= invDet;
+			baryV *= invDet;
+
+			if (rayT < distance && rayT > 0.f) {
+				hitObject = mesh;
+				hitPosition = verts[0] + edge1 * baryU + edge2 * baryV;
+				return true;
+			}
+		}
+	}
+	return false;
 }

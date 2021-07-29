@@ -16,8 +16,8 @@ void Scene::start() {
 }
 
 void Scene::update(float deltaTime) {
-	for (Object* obj : objects)
-		obj->update(deltaTime);
+	for (int i = 0; i < objects.size(); i++)
+		objects[i]->update(deltaTime);
 }
 
 void Scene::lateUpdate(float deltaTime) {

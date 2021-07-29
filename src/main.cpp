@@ -29,7 +29,7 @@ int main() {
 	wall->setPosition(glm::vec3(0.f, 10.f, 2.f));
 	wall->setScale(glm::vec3(10.f, 2.f, 4.f));
 	wall->material = wallMat;
-	wall->setRotation(glm::vec3(0.f, 0.f, -60.f));
+	wall->setRotation(glm::vec3(30.f, 30.f, 32.f));
 
 	wall = new Mesh(world);
 	wall->loadMesh("Box.obj");
