@@ -1,7 +1,7 @@
 #include "Puff.h"
 
 Puff::Puff(Scene* scene) : Billboard(scene),
-	lifetime(0.3f),
+	lifetime(0.5f),
 	timer(0.f),
 	direction(glm::vec3(0.f, 0.f, 1.f))
 {

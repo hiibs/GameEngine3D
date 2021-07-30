@@ -17,7 +17,7 @@ private:
 	Mesh* weapon;
 	const Input* input;
 	float time;
-	bool shoot;
+	bool jumpQueued;
 	glm::vec3 weaponPos;
 	glm::vec3 cameraPos;
 

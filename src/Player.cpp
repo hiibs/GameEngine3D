@@ -9,7 +9,7 @@ Player::Player(Scene* scene) : BoxHull(scene),
 	time(0.f),
 	weaponPos(glm::vec3(0.05f, 0.15f, -0.12f)),
 	cameraPos(glm::vec3(0.f, 0.f, 0.7f)),
-	shoot(false)
+	jumpQueued(false)
 {
 	// Set player size
 	halfExtents = glm::vec3(0.4f, 0.4f, 0.9f);
@@ -65,9 +65,9 @@ void Player::update(float deltaTime) {
 	
 
 	// Shoot
-	if (input->isPressed(LEFT_CLICK)) {
+	if (input->getButtonPressed("Fire")) {
 		glm::vec3 start = camera->getWorldPosition();
-		glm::vec3 end = camera->getWorldPosition() + camera->getForwardVector() * 10.f;
+		glm::vec3 end = camera->getWorldPosition() + camera->getForwardVector() * 100.f;
 
 		Object* hitObject = nullptr;
 		glm::vec3 hitPos, hitNormal;
@@ -107,13 +107,13 @@ void Player::move(glm::vec3 delta, bool updatePhysics) {
 glm::vec3 Player::getInputDir() const {
 	glm::vec3 dir = glm::vec3(0.f);
 
-	if (input->isPressed(FORWARD))
+	if (input->getButton("Forward"))
 		dir += getForwardVector();
-	if (input->isPressed(BACK))
+	if (input->getButton("Back"))
 		dir += -getForwardVector();
-	if (input->isPressed(RIGHT))
+	if (input->getButton("Right"))
 		dir += getRightVector();
-	if (input->isPressed(LEFT))
+	if (input->getButton("Left"))
 		dir += -getRightVector();
 
 	return glm::length(dir) > 0.1f ? glm::normalize(dir) : glm::vec3(0.f);
@@ -139,7 +139,7 @@ void Player::updateMovement(float deltaTime) {
 	
 	//velocity -= lastCorrection;
 
-	if (input->isPressed(CROUCH)) {
+	if (input->getButton("Crouch")) {
 		halfExtents.z = 0.45f;
 		runSpeed = 4.f;
 		crouched = true;
@@ -150,6 +150,11 @@ void Player::updateMovement(float deltaTime) {
 			//move(glm::vec3(0.f, 0.f, 0.45f));
 		}
 	}
+
+	if (input->getButtonPressed("Jump"))
+		jumpQueued = true;
+	else if (!input->getButton("Jump"))
+		jumpQueued = false;
 
 	if (isGrounded) {
 		velocity += getInputDir() * acceleration * deltaTime;
@@ -168,9 +173,10 @@ void Player::updateMovement(float deltaTime) {
 		else
 			velocity = glm::vec3(0.f);
 		
-		if (input->isPressed(JUMP) && !crouched) {
+		if (jumpQueued && !crouched) {
 			move(glm::vec3(0.f, 0.f, 0.1f));
 			velocity.z = 6.f;
+			jumpQueued = false;
 		}
 	}
 	else {
